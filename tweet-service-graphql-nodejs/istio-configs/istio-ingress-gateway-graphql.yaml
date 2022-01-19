@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-ingressgateway-graphql
+  #https://stackoverflow.com/questions/52839778/using-the-same-istio-gateway-with-multiple-ports-and-protocols
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 5001
+      name: http
+      protocol: HTTP
+    hosts:
+    - "local.cloudentity.com"

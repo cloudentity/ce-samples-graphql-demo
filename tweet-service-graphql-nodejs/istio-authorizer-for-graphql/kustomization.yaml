@@ -1,0 +1,12 @@
+
+resources:
+- manifest.yaml
+secretGenerator:
+- name: istio-authorizer-secrets
+  namespace: acp-system
+  literals:
+  - CLIENT_ID=c7gaucgh5kre1l3pf4n0
+  - CLIENT_SECRET=ABnaFnrIpLItMnmCO4FfWV77vNOw89A7_ZXUE4m6FoE
+  - ISSUER_URL=https://rtest.us.authz.cloudentity.io/rtest/system
+  - TENANT_ID=rtest
+  - SERVER_ID=system

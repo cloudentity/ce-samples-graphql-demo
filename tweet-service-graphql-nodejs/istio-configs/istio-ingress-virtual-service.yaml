@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: graphql-demo-virtual-service
+spec:
+  hosts:
+  - "local.cloudentity.com"
+  gateways:
+  - istio-ingressgateway-graphql
+  http:
+  - match:
+    - uri:
+        prefix: /alive
+    - uri:
+        prefix: /schema
+    - uri:
+        prefix: /graphql
+    route:
+    - destination:
+        port:
+            number: 5001
+        host: svc-apps-graphql-tweet-service-graphql-nodejs.svc-apps-graph-ns.svc.cluster.local

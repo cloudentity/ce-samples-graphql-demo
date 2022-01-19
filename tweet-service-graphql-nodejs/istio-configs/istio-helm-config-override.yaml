@@ -1,0 +1,26 @@
+service:
+  # Type of service. Set to "None" to disable the service entirely
+  type: LoadBalancer
+  ports:
+  - port: 15021
+    targetPort: 15021
+    name: status-port
+    protocol: TCP
+  - port: 80
+    targetPort: 8080
+    name: http2
+    protocol: TCP
+    nodePort: 31233
+  - port: 5001
+    targetPort: 5001
+    name: http5001
+    protocol: TCP
+    nodePort: 31234
+  - port: 443
+    targetPort: 8443
+    name: https
+    protocol: TCP
+  annotations: {}
+  loadBalancerIP: ""
+  loadBalancerSourceRanges: []
+  externalTrafficPolicy: ""
