@@ -1,14 +1,14 @@
-# Build and secure a GraphQL based application with Clouedntity authorization platform
+# Build and secure a GraphQL based application with Cloudentity authorization platform
 
-This article is part 2 of our Graph QL application protection series. In this article, we will build a graphQL API
+This article is part 2 of our GraphQL application protection series. In this article, we will build a GraphQL API
 server and protect its resources with externalized policies administered in Cloudentity Authorization SaaS platform.
 We will also protect the GraphQL API endpoint data with a local policy enforcement/decision point for the app deployed 
-within a local Kubernetes cluster. This approach also showcase a 
-modern application protection hybrid model with local enforcement and Cloud based authorization and policy adminstration.
+within a local Kubernetes cluster. This approach also will showcase a 
+modern application protection hybrid model with local enforcement and Cloud based authorization and policy administration.
 
-* Part 1: Externalized authorization for GraphQL using Cloudentity authorization platform.
-* Part 2: Build a GraphQL server with Nodejs and protect with Clouedntity authorization platform
-* Part 3. Build a GraphQL client react application to consume GraphQL server resource and protect with Cloudentity authorization platform.
+* Part 1: Externalized authorization for GraphQL using the Cloudentity authorization platform
+* Part 2: Build a GraphQL server with Node.js and protect with the Cloudentity authorization platform
+* Part 3. Build a GraphQL client react application to consume GraphQL server resources protected with the Cloudentity authorization platform
 
 ## Overview 
 
@@ -39,7 +39,7 @@ to build apps.
 This step will create a `package.json` for the project that will eventually hold dependencies and other execution script commands
 
 ```
-mkdir tweet-service-graphql-nodejs
+mkdir tweet-service-graphql-nodejs && cd tweet-service-graphql-nodejs
 npm init
 ```
 
@@ -55,7 +55,7 @@ Click enter with no input for all prompts during npm init and finally type `yes`
 Create a file named `index.js` and add basic router and listeners. We will use the npm `express` module for easily adding route handling
 
 
-```
+```js
 var express = require('express');
 var app = express();
 
@@ -74,15 +74,15 @@ console.log("Server listening at http://localhost:5001/");
 
 * Install dependencies
 
-```
-npm install express
+```bash
+npm install --save express
 ```
 
 * Update package.json
 
-Add a`start` command to scripts section in `package.json` to start the app quickly
+Add a `start` command to scripts section in `package.json` to start the app quickly, e.g.:
 
-```
+```json
 {
   "name": "tweet-service-graphql-nodejs",
   "version": "1.0.0",
@@ -100,11 +100,11 @@ Add a`start` command to scripts section in `package.json` to start the app quick
 
 * Run the app
 
-```
+```bash
 npm start
 ```
 
-This will start and serve the node app listener and below endpoints should be serving traffic
+This will start and serve the Node app listener, and the endpoints below should be serving traffic:
 
 * [http://localhost:5001](http://localhost:5001)
 * [http://localhost:5001/health](http://localhost:5001/health)
@@ -119,16 +119,8 @@ Let's install the dependencies and attach a listener endpoint for graphQL.
 
 * **Install npm packages for graphQL support**
 
-```
-npm install graphql express-graphql
-```
-
-* **Import packages in `index.js`**
-
-```
-//graphql package import
-var { graphqlHTTP } = require('express-graphql');
-var { buildSchema } = require('graphql');
+```bash
+npm install --save graphql express-graphql
 ```
 
 * **Define a GraphQL schema**
@@ -137,8 +129,12 @@ var { buildSchema } = require('graphql');
 defined in the [GraphQL specification](https://spec.graphql.org/June2018/#sec-Schema). Let's build a schema that has a mixed 
 flavor of basic object types, fields, query and mutations. Add below block to `index.js`
 
-```
-//graphql schema definition
+```js
+// graphql package import
+var { graphqlHTTP } = require('express-graphql');
+var { buildSchema } = require('graphql');
+
+// graphql schema definition
 var schema = buildSchema(
 	`
 	input TweetInput {
@@ -168,7 +164,7 @@ var schema = buildSchema(
 );
 ```
 
-In above schema, following constructs are available and later in the article we will be applying externalized authorization
+In above schema, following constructs are available and later in the article we will explore how to attach externalized authorization
 policies to each of these constructs.
 
 | GraphQL Construct | Examples |
@@ -179,25 +175,20 @@ policies to each of these constructs.
 | Mutation | createTweet, updateTweet, deleteTweet .. |
 
 
-* **Provide implementation for a GraphQL query**
+* **Add implementation & listener for a GraphQL query**
 
-Let's add a simple resolver implementation for the first query `sayHiTweety` and we will expand to other query and mutation implementations
-later in the article.
+Let's add a simple resolver implementation for the first query `sayHiTweety`. We will expand to other query and mutation implementations
+later in the article. In contrast to REST, GrpahQL is designed to be a single endpoint API system. So all the queries and mutations will 
+be served over this single enpoint at `/graphql`. The url name can be anything, `graphql` is just used for convenience.
 
-```
+```js
+
 var resolverRoot = {
 	sayHiTweety: () => {
 	return 'Hello Tweety';
     }
 };
-```
 
-* **Expose GraphQL API endpoint listener**
-
-In contrast to REST, GrpahQL is designed to be a single endpoint API system. So all the query and mutations will be served over this single enpoint
-at `/graphql`. The url name can be anything, `graphql` is just used for convenience.
-
-```
 app.use('/graphql', graphqlHTTP(
 {
 	schema: schema,
@@ -212,16 +203,19 @@ app.use('/graphql', graphqlHTTP(
 * **Verify GraphQL API operations**
 
 Start the application using `npm start` and launch the graphQL endpoint at [http://localhost:5001/graphql](http://localhost:5001/graphql).
-Since the graphiql is set to true, we will see an interactive query screen and schema explorer as response.
+Since the `graphiql` flag is set to true, we will see an interactive query screen and schema explorer as response.
 
 ---
 **NOTE**
 
-We will not be using above interface but we recommend usage of [Postman](https://www.postman.com/downloads/) app for further verification of graphql API's.
+We will not be using above interface but usage of [Postman](https://www.postman.com/downloads/) app for further verification of GraphQL APIs
+is recommended.
 
 ---
 
-[Download postman](https://www.postman.com/downloads/) app, in case you don't have it already, and then [import](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman) the [Cloudentity GraphQL tweet service demo postman collection](https://www.getpostman.com/collections/b84dcc2e6d7034c02d48) onto Postman.
+* **Download Postman collections**
+
+[Download Postman](https://www.postman.com/downloads/) app, in case you don't have it already, and then [import](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/#importing-data-into-postman) the [Cloudentity GraphQL tweet service demo postman collection](https://www.getpostman.com/collections/b84dcc2e6d7034c02d48) onto Postman.
 
 
 * **Execute GraphQL `sayHiTweety` query**
@@ -233,26 +227,24 @@ It should respond with the response attached below.
 
 ### Expand GraphQL implementation logic 
 
-Let's add a simple in memory datastore to store the tweets and then add some mutations and queries to act on those objects.
+Let's add a simple in-memory datastore to store the tweets and then add some mutations and queries to act on those objects.
 We are not going to dive into the specifics and add any complex business logic. Our main goal is to showcase **externalized 
 authorization policy administration and enforcement** for the various **GraphQL objects, fields, queries and mutations etc at runtime**.
 
 * Install dependencies
 
-```
-npm install uuid lokijs
+```bash
+npm install --save uuid lokijs
 ```
 
-* Import packages
+* Add implementation for GraphQL query and mutation
 
-```
+```js
+//imports
 var loki = require('lokijs');
 const {v4: uuidv4} = require('uuid');
-```
 
-* Add business logic for GraphQL query and mutation
-
-```
+//logic
 var db = new loki('tweets.db');
 var tweets = db.addCollection('tweets');
 
@@ -316,47 +308,53 @@ var resolverRoot = {
 
 * **Verify all GraphQL API operations**
 
-Navigate to the imported collection in Postman and run rest of the GraphQL endpoints, these
-should now return responses similar to below attached samples
+Navigate to the imported collection in Postman and run rest of the GraphQL endpoints. These
+should now return responses similar to below attached samples:
 
 ![Graphql-api-responses](graphql-sample-responses.jpeg)
 
-Note that at this point the application is **completely unprotected** and anyone can request any data.
-So let's dive into the most interesting part of protecting the application using **externalized
-authorization policies using the Cloudentity platform** without touching the application code at all.
-Before we do the protection, let's make sure that we deploy the application onto a container management
-platform that will be used in real production, for example, Kubernetes.
+---
+**NOTE**
 
-### Deploy and Run application workload in Kubernetes cluster
+Note that at this point the application is **completely unprotected** and anyone can post/request data without authorization.
 
-Let's deploy the app onto workload platforms that will be used in real world scenarios. In this case
-we will be deploy it onto a local Kubenrnets cluster and then running the application as a container on the 
-Kubernetes platform.
+---
+
+### Deploy and Run GraphQL API workload in Kubernetes cluster
+
+Let's deploy the GraphQL API onto a local Kubernetes cluster to enforce **externalized
+authorization policies with the Cloudentity platform** without modifying the application code at all.
 
 ### Pre-requisites
 
-To build and run the image in local Kubernetes cluster, we will need following pre-requisites. Kubenertes cluster
-can be deployed using any tool of your choice but we find `kind` to be good for local development purpose.
+Local Kubernetes cluster
+can be deployed using any tool of your choice, we will use `kind` for this application.
 
 * [docker](https://docs.docker.com/get-docker/)
 * [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 * [helm](https://helm.sh/docs/helm/helm_install/)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
+---
+**NOTE**
+
+> We will be referencing `make` commands in below sections. There is a `Makefile` in the project folder and
+> the contents can be inspected for the actual commands that is orchestrated by the `make` target
+
+---
+
 ### Build the docker image
 
-Let's build a quick docker image. There is a `Makefile` for reference that can be used to build the docker
-or use
-
-`docker build . -t tweet-service-graphql-nodejs` or `make build-image`
+Let's build the docker image for GraphQL API using `make build-image`
 
 ### Launch the kubenertes cluster
 
 Let's launch a `kind` cluster and deploy the app. We will pass in a cluster config to expose a `NodePort` outside of
 the cluster for access at port `5001` since do not have an actual load balancer.
 
-.Contents of k8s-cluster-config.yaml
-```
+Contents of k8s-cluster-config.yaml
+
+```yaml
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -367,29 +365,33 @@ nodes:
     protocol: TCP
 ```
 
-Let's launch the kind cluster using the command in `Makefile`
+Let's launch the kind cluster using the command in `Makefile`:
 
 `make deploy-cluster`
 
-Once complete, you can see the cluster using `kind get clusters` and should see a cluster named `local-dev`
+Once complete, you can see the cluster details using `kind get clusters`
 
-### Deploy the app on kubernetes cluster
+### Deploy GraphQL app on the Kubernetes cluster
 
-We will use helm to define and deploy all the kubernetes resources required for the application. We will not be
+We will use helm to define and deploy all the Kubernetes resources required for the application. We will not be
 going into the helm details, [you can find all the helm templates already in the repo].
 
-Let's upload the image to kind cluster, create a kubernetes namespace and deploy the GraphQL app. This all 
-can be done running below `make` command.
+Let's upload the image to kind cluster, create a Kubernetes namespace and deploy the GraphQL app. This all 
+can be done running the `make` command below.
 
 `make deploy-app-graph-ns`
 
-Above make target will launch all the pods and services to run the GraphQL app. It can be confirmed using
+Above make target will launch all the pods and services to run the GraphQL app. The status of the pods and services can be fetched using:
 
-`kubectl get pods -n svc-apps-graph-ns`
+```bash
+kubectl get pods -n svc-apps-graph-ns
 
-`kubectl get services -n svc-apps-graph-ns`
+kubectl get services -n svc-apps-graph-ns
+```
 
-### Check service is accessible
+
+
+### Service readiness
 
 Let's exec into the pod container to see if the service is reachable
 
@@ -399,13 +401,13 @@ kubectl exec -it svc-apps-graphql-tweet-service-graphql-nodejs-8457684f9f-lnqrd 
 
 and run
 
-```
+```bash
 curl --location --request POST 'http://local.cloudentity.com:5001/graphql' \
 --header 'Content-Type: application/json' \
 --data-raw '{"query":"query {\n    sayHiTweety\n}\n","variables":{}}'
 ```
 
-```
+```json
 {
     "data": {
         "sayHiTweety": "Hello Tweety"
@@ -415,41 +417,39 @@ curl --location --request POST 'http://local.cloudentity.com:5001/graphql' \
 ---
 **NOTE**
 
-The components deployed on the Kubernetes cluster are not exposed outside the Kubernetes cluster. External access to individual services can provided by creating an external load balancer or node port on each service. An Ingress Gateway resource can be created to allow external requests through the Istio Ingress Gateway to the backing services.
+The components deployed on the Kubernetes cluster are not exposed outside the Kubernetes cluster. External access to individual services can be provided by creating an external load balancer or node port on each service. An Ingress Gateway resource can be created to allow external requests through the Istio Ingress Gateway to the backing services.
 
 ---
 
 ### Deploy Istio
 
-To allow external service access, let's install `Istio` onto this cluster. We will use the [`helm` based install mechanims for installing `istio`](https://istio.io/latest/docs/setup/install/helm/)
+To allow external service access, let's install `Istio` onto this cluster. We will use the [`helm` based install mechanism for installing `istio`](https://istio.io/latest/docs/setup/install/helm/)
 We have condensed all required steps under the `make` target, which updates the helm repo and installs `istiod` under `istio-system` namespace.
 
-```
+```bash
 make deploy-istio
 ```
 
-Check the status of the pods using `kubectl get pods -n istio-system`
+Check the status of the pods using `kubectl get pods -n istio-system` and once the pod is healthy, let's add an Istio Ingress Gateway to expose the traffic outside the cluster
 
-Once this is complete, let's add an Istio Ingress Gateway to expose the traffic outside the cluster
+### Expose the Service externally with Istio Ingress Gateway
 
-### Expose the Service to external world with Istio Ingress Gateway
+Let's install the `Istio Ingress Gateway` and configure a `Virtual Service` for routing to the GraphQL service in the `svc-apps-graph-ns` namespace using:
 
-We have another `make` target that will install the `Istio Ingress Gateway` and configure a `Virtual Service` for routing to the GraphQL service in the `svc-apps-graph-ns` namespace
-
-```
+```bash
 make deploy-istio-gateway
 ```
 
 You can confirm if the gateway and virtual service is created and running using
 
-```
+```bash
 kubectl get gateways -A
 kubectl get virtualservices -A
 ```
 
-Now let's check again, if we can access the service from outside the cluster
+Now let's check to see if we can access the service from outside the cluster
 
-```
+```bash
 curl --location --request POST 'http://localhost:5001/graphql' \
 --header 'Host: local.cloudentity.com' --header 'Content-Type: application/json' \
 --data-raw '{"query":"query {\n    sayHiTweety\n}\n","variables":{}}'
@@ -457,7 +457,7 @@ curl --location --request POST 'http://localhost:5001/graphql' \
 
 OR
 
-```
+```bash
 curl --location --request POST 'http://local.cloudentity.com:5001/graphql' \
 --header 'Content-Type: application/json' \
 --data-raw '{"query":"query {\n    sayHiTweety\n}\n","variables":{}}'
@@ -467,9 +467,9 @@ Notice that the either the `Host` header needs to be passed in or the domain
 needs to have a matching name of `local.cloudentity.com` as its defined in the `iStio Virtual
 Service` routing rule.
 
-Exptected output.
+Expected output.
 
-```
+```json
 {
     "data": {
         "sayHiTweety": "Hello Tweety"
@@ -477,7 +477,7 @@ Exptected output.
 }
 ```
 
-Viola! Now the services should be accessible from outside the cluster. Now that we have a production like K8S deployment serving GraphQL operations from the platform; let's dive into the most interesting part of protecting the application using **externalized authorization policies using the Cloudentity platform** without touching the application code at all.
+Voila! Now the services should be accessible from outside the cluster. Now that we have a production like Kubernetes deployment serving GraphQL operations from the platform, let's dive into protecting the application using **externalized authorization policies using the Cloudentity platform** without altering the application code at all.
 
 ## Authorization Policy administration in Cloudentity authorization platform
 
@@ -492,7 +492,7 @@ Cloudentity micropermeter authorizers can self discover API endpoints if annotat
 
 For example, in the helm chart, we have annotated the services so that final Deployment resource file has the annotations. So the schema file for the service is being read from below location.
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -504,16 +504,16 @@ metadata:
     services.k8s.cloudentity.com/graphql-path: "/graphql"
 ```
 
-This will enable these services to be auto discovered whenever Cloudentity Istio authorizers are deployed onto a cluster and configured to scan the namespace on which the service is deployed.
+This will enable these services to be auto discovered whenever Cloudentity Istio authorizers are deployed onto a cluster and is configured to scan the namespace on which the service is running.
 
 In case you want to change the annotation, you can update the url in the helm template and do the following
 
-```
+```bash
 helm uninstall  svc-apps-graphql -n svc-apps-graph-ns
 helm install svc-apps-graphql helm-chart/tweet-service-graphql-nodejs -n svc-apps-graph-ns
 ```
 
-Make sure to check the service is still reachable. Let's march on to next step.
+Make sure to check the service is still reachable.
 
 ### Download Istio authorizer microperimeter (Policy decision enforcer)
 
@@ -572,7 +572,27 @@ kubectl apply -k .
 Above command will create a new `acp-system` namespace and deploy the `istio-authorizer` under that namespace. Watch for the pod status to make sure the `istio-authorizer`
 comes up clean and healthy.
 
+Let's also add a request body parser sidecar for the pod, without this the micro-perimeter will not be able to interpret the GraphQL request body.
+
 ```
+kubectl apply -f parse-body.yaml
+```
+
+> NOTE
+> If you don't apply aboe request parser sidecar, you will get this error
+> 
+> ```json
+> {
+    "errors": [
+        {
+            "message": "failed to parse json: unexpected end of JSON input"
+        }
+    ]
+}
+>```
+
+
+```bash
 kubectl get pods -n acp-system
 ```
 
@@ -634,12 +654,12 @@ Cloudentity istio authorizer is designed to be an [Istio External authorizer](ht
 
  Edit the `istio config map` to define the external Cloudentity Istio authorizer.
 
-```
+```bash
 kubectl edit configmap istio -n istio-system
 ```
 Add `extensionProviders` under `mesh` section to indicate that `acp-authorizer` will be an external authz provider.
 
-```
+```yaml
 data:
   mesh: |-
     extensionProviders:
@@ -649,8 +669,9 @@ data:
         port: "9001"    
 ```
 
-. FInal Sample config
-```
+ Final Sample config
+
+```yaml
 apiVersion: v1
 data:
   mesh: |-
@@ -703,7 +724,7 @@ metadata:
 
 Restart `istiod` for the **external authorizer defintion** to be picked up
 
-```
+```bash
 kubectl rollout restart deployment/istiod -n istio-system
 ```
 
@@ -712,7 +733,7 @@ kubectl rollout restart deployment/istiod -n istio-system
 Now that the external authorizer is defined and let's define the [external authorization policy](https://istio.io/latest/docs/concepts/security/#implicit-enablement).  
 External authorization policies are "CUSTOM" actions and will be evaluated first in the Istio authorization policy authorizer. 
 
-```
+```bash
 kubectl apply -f istio-configs/istio-mp-authorizer-policy.yaml
 ```
 
@@ -720,6 +741,14 @@ At this point, all the platform components are installed and configured and we s
 be able to apply externalized authorization policies in Cloudentity authorization platform and 
 see at runtime the policy decision and enforcement being done by the `istio-authorizers` running in a local
 Kubernetes cluster.
+
+### Restart the service pods
+
+Since we are using automatic istio injection, we need to recreate the pod, so that `envoy-proxy` is injected
+
+```
+kubectl rollout restart deployment/svc-apps-graphql-tweet-service-graphql-nodejs -n svc-apps-graph-ns
+```
 
 ## Enforce externalized dynamic authorization
 
@@ -738,8 +767,28 @@ Let's test our postman again and we should see a `403` response.
 
 
  
+| Authorization policy | Output |
+| --- | ----------- |
+| ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
+| ![alt-text-1](protected-graphql-endpoint.png "title-1") | ![alt-text-2](graphql-api-protected.png "title-2") |
 
 
+### Scenario#2: Disallow queries if they ask for a specific field 
+
+Let's say we do not want GraphQL clients to ask for specific field that is available in the schema. These could be internal identifiers or only could be requested
+by some special priviliged internal applications.
+
+Let's got to the `Tweet` object and block `dateModified` completely. Now let's ask for the field `dateModified` in `getLatestTweets` query
+
+
+
+Let's say we want to temporarily block access to all user's for this endpoint. All we need to do is to go to the Cloudentity Authorization portal, navigate to the GraphQL API and select the endpoint and attach  a `BLOCK API`.
+
+Let's test our postman again and we should see a `403` response.
+
+
+
+ 
 | Authorization policy | Output |
 | --- | ----------- |
 | ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
@@ -747,9 +796,64 @@ Let's test our postman again and we should see a `403` response.
 
 
 
-* 
+### Scenario#3:Block any operations that ask for a specific object unless in a specific IP range
 
-* Let's see the magic
+Let's say we do not want to return `Tweet` object for any operation. In this case, we can apply a policy at the object level
+for IP address check that is available in the given range. For this we will use the inbuilt `Rego` engine to author
+the policy
 
-There are multiple ways to enforce authorization, in this article we will be looking at a mechanism of decoupled,centralized and 
+
+
+
+
+ 
+| Authorization policy | Output |
+| --- | ----------- |
+| ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
+| ![alt-text-1](protected-graphql-endpoint.png "title-1") | ![alt-text-2](graphql-api-protected.png "title-2") |
+
+
+### Scenario#4:Block delete operation unless it comes from a client with specific metadata
+
+Let's say we do not want to return `Tweet` object for any operation. In this case, we can apply a policy at the object level
+for IP address check that is available in the given range. For this we will use the inbuilt `Rego` engine to author
+the policy
+
+
+
+
+
+ 
+| Authorization policy | Output |
+| --- | ----------- |
+| ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
+| ![alt-text-1](protected-graphql-endpoint.png "title-1") | ![alt-text-2](graphql-api-protected.png "title-2") |
+
+
+### Scenario#5:Block create operation unless the token is issued by a specific Authorization server
+
+Let's apply a policy to check the issuer of the accessToken that was presented to access the resource
+
+
+
+
+
+
+
+ 
+| Authorization policy | Output |
+| --- | ----------- |
+| ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
+| ![alt-text-1](protected-graphql-endpoint.png "title-1") | ![alt-text-2](graphql-api-protected.png "title-2") |
+
+
+
+
+
+## Next steps
+
+Now that we have protected a GraphQL API resource server with dynamic and flexible authorization policies, we will build
+a simple GraphQL client application to demonstrate an entire application in real life. In this client application, we will
+looking at how to get an accessToken from Cloudentity authorization server and then utilize it to make further calls
+to resource server.
 
