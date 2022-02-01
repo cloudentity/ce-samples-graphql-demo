@@ -752,41 +752,22 @@ kubectl rollout restart deployment/svc-apps-graphql-tweet-service-graphql-nodejs
 
 ## Enforce externalized dynamic authorization
 
-Let's play with some authorization scenarios to see the power of Cloudentity authorization platform.
-
 Before we start enforcing policies, let's run the postman to see if all the API operations are still
 accessible. Once that is done, let's try to add more authorization scenarios to enforce access and 
-authorization policies.
+authorization policies authored and managed via the Cloudentity authorization platform.
 
-### Scenario#1: Block graphQL endpoint alltogether
+For policy governance, we expect the admin(policy administrator) to
+* Login into the Cloudentity Authorization portal
+* Navigate to the workspace and select APIs nav item to see the GraphQL API's
 
-Let's say we want to temporarily block access to all user's for this endpoint. All we need to do is to go to the Cloudentity Authorization portal, navigate to the GraphQL API and select the endpoint and attach  a `BLOCK API`.
+### Scenario#1: Block GraphQL endpoint alltogether
 
-Let's test our postman again and we should see a `403` response.
+Let's say we want to temporarily block access to all user's for this endpoint. For this
+* Select the GraphQL API endpoint and attach  a `Block API` policy.
 
-
-
- 
-| Authorization policy | Output |
-| --- | ----------- |
-| ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
-| ![alt-text-1](protected-graphql-endpoint.png "title-1") | ![alt-text-2](graphql-api-protected.png "title-2") |
-
-
-### Scenario#2: Disallow queries if they ask for a specific field 
-
-Let's say we do not want GraphQL clients to ask for specific field that is available in the schema. These could be internal identifiers or only could be requested
-by some special priviliged internal applications.
-
-Let's got to the `Tweet` object and block `dateModified` completely. Now let's ask for the field `dateModified` in `getLatestTweets` query
-
-
-
-Let's say we want to temporarily block access to all user's for this endpoint. All we need to do is to go to the Cloudentity Authorization portal, navigate to the GraphQL API and select the endpoint and attach  a `BLOCK API`.
-
-Let's test our postman again and we should see a `403` response.
-
-
+This in effect blocks any call made to any GraphQL operation. Run any of the test
+in the [imported Postman Test collection](https://www.getpostman.com/collections/b84dcc2e6d7034c02d48) 
+and we should see a `403` response.
 
  
 | Authorization policy | Output |
@@ -795,65 +776,110 @@ Let's test our postman again and we should see a `403` response.
 | ![alt-text-1](protected-graphql-endpoint.png "title-1") | ![alt-text-2](graphql-api-protected.png "title-2") |
 
 
+### Scenario#2: Disallow GraphQL queries for specific fields
 
-### Scenario#3:Block any operations that ask for a specific object unless in a specific IP range
+Let's say we do not want GraphQL clients to ask for specific field that is available in the schema. These could be internal
+ identifiers or only could be requested by some special priviliged internal applications.For this
+* Select the GraphQL API endpoint and enter into the `GraphQL API explorer`
+* Navigate to `Objects` and go to the `Tweet` field.
+* Assign the `Block API` policy to `dateModified` completely. 
 
-Let's say we do not want to return `Tweet` object for any operation. In this case, we can apply a policy at the object level
+This in effect blocks any `GraphQL query` that requests for the `dateModified` field. Let's run the `getLatestTweets`
+query from the [imported Postman Test collection](https://www.getpostman.com/collections/b84dcc2e6d7034c02d48).
+
+Modify the request payload to include/exclude `dateModified` in the query and observe the response difference.
+Whenever `dateModified` is requested, the request is automatically rejected.
+
+ 
+| Authorization policy | Output |
+| --- | ----------- |
+| ![alt-text-1](date-modified-enforce.png "title-1") |  ![alt-text-2](api-field-date-modified-absent.png "title-2") |
+| ![alt-text-1](date-modified-enforce.png "title-1") | ![alt-text-2](api-field-date-modified-present.png "title-2") |
+
+
+
+### Scenario#3: Disallow GraphQL queries for specific objects with constraints 
+
+Let's say we do not want GraphQL clients to ask for specific object unless some specific constraints are met for that
+client application. For example, we want to return the `Tweet` object only when some `constraint` is met.
+In this  we can apply a policy at the object level
 for IP address check that is available in the given range. For this we will use the inbuilt `Rego` engine to author
-the policy
+the policy.
+
+For this:
+* Select the GraphQL API endpoint and enter into the `GraphQL API explorer`
+* Navigate to `Objects` 
+* Select the `Tweet` object and apply the constrained `IP check` policy at object level.
+
+`Sample Rego policy`
+```yaml
+package acp.authz
+
+default allow = false
+
+allowedCidrRange :=   
+    [ 
+    "3.0.0.0/9",
+    "3.128.0.0/10", 
+    "4.0.0.0/8", 
+    "5.8.63.0/32", 
+    "5.10.64.160/29", 
+    "217.161.27.0/25"
+    ]
+    
+extracted_ip := input.request.headers["X-Custom-User-IP"][_]   
+    
+is_within_allowed_cidr = true {
+    some i
+    net.cidr_contains(allowedCidrRange[i], extracted_ip)
+} else = false    
+
+allow {
+  is_within_allowed_cidr
+}
+
+```
+ 
+| Authorization policy | Output |
+| --- | ----------- |
+| ![alt-text-1](graphql-object-protect.png "title-1") |  ![alt-text-2](api-object-response.png "title-2") |
 
 
+### Scenario#4: Block GraphQL delete mutation unless it comes from a client with specific metadata
 
+Let's say we do not want all GraphQL clients to operate on `deleteTweet` mutation.
+For example, we want to allow only accessToken's issued to specific clients to be authorized to use the
+`deleteTweet` mutation. This way this operation can be used by specific clients and not all client apps even
+though it is available in schema.
 
+For this:
+* Select the GraphQL API endpoint and enter into the `GraphQL API explorer`
+* Navigate to `Mutation` 
+* Select the `deleteTweet` Mutation operation and apply the constrained `allow-only-for-specific-clients` policy at mutation level.
 
  
 | Authorization policy | Output |
 | --- | ----------- |
-| ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
-| ![alt-text-1](protected-graphql-endpoint.png "title-1") | ![alt-text-2](graphql-api-protected.png "title-2") |
+| ![alt-text-1](allow-specific-clients.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
 
 
-### Scenario#4:Block delete operation unless it comes from a client with specific metadata
+### Scenario#5: Allow GraphQL query only if token is issued by a specific Authorization server
 
-Let's say we do not want to return `Tweet` object for any operation. In this case, we can apply a policy at the object level
-for IP address check that is available in the given range. For this we will use the inbuilt `Rego` engine to author
-the policy
+Let's say we do not want all GraphQL clients to operate on `getTweets` query.
+For example, we want to allow only accessToken's issued by specific authorization servers to be authorized to use the
+`getTweets` query. 
 
-
-
-
-
+![alt-text-1](issuer-check-policy.png)
  
 | Authorization policy | Output |
 | --- | ----------- |
-| ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
-| ![alt-text-1](protected-graphql-endpoint.png "title-1") | ![alt-text-2](graphql-api-protected.png "title-2") |
-
-
-### Scenario#5:Block create operation unless the token is issued by a specific Authorization server
-
-Let's apply a policy to check the issuer of the accessToken that was presented to access the resource
-
-
-
-
-
-
-
- 
-| Authorization policy | Output |
-| --- | ----------- |
-| ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
-| ![alt-text-1](protected-graphql-endpoint.png "title-1") | ![alt-text-2](graphql-api-protected.png "title-2") |
-
-
-
+| ![alt-text-1](graphql-query-enforce.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
 
 
 ## Next steps
 
 Now that we have protected a GraphQL API resource server with dynamic and flexible authorization policies, we will build
 a simple GraphQL client application to demonstrate an entire application in real life. In this client application, we will
-looking at how to get an accessToken from Cloudentity authorization server and then utilize it to make further calls
-to resource server.
+look at how to get an accessToken from Cloudentity authorization server and then utilize it to make further calls
+to GraphQL API resource server.
 
