@@ -1,172 +1,33 @@
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
 import './index.css';
-//import App from './App';
-import { render } from 'react-dom';
-import { setContext } from '@apollo/client/link/context';
-
 import reportWebVitals from './reportWebVitals';
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  useQuery,
-  createHttpLink,
-  gql,
-  from
-} from "@apollo/client";
+import { render } from 'react-dom';
 import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link,
-  Navigate,
-  useNavigate } from "react-router-dom";
+  Navigate } from "react-router-dom";
 
 
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-import styled from '@material-ui/core/styles/styled';
 
-import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
-
-import TextField from "@mui/material/TextField";
-
-import {HomePageContent} from './homePage.js';
-import {LandingContent} from './landing.js';
-import { TodayOutlined } from '@material-ui/icons';
-
-import CloudentityAuth from '@cloudentity/auth';
-import authConfig from './authConfig.js';
-import { useAuth } from './auth.js';
-
-import { onError } from "@apollo/client/link/error";
-  
-
-//const client = new ApolloClient({
-//  uri: 'http://localhost:3000/graphql-voting',
-//  cache: new InMemoryCache()
-//});
-
-function App() {
-
-  //const navigate = useNavigate();
-  const cloudentity = new CloudentityAuth(authConfig);
-  const [authenticated] = useAuth(cloudentity);
-  const accessTokenRaw = localStorage.getItem(authConfig.accessTokenName);
-  const auth = authenticated && accessTokenRaw;
-
-  return (
-    <Router>
-      <div>
-        <Routes>
-          <Route path="/vote" element={<VotingPage/>}>
-          </Route>
-          <Route path="/authenticateduser"  element={<LandingContent/>}>
-          </Route>
-          <Route path="/"  element={!auth ? <HomePageContent auth={auth} /> : <Navigate to='/authenticateduser' /> }>
-          </Route>
-        </Routes>
-      </div>
-    </Router>
-  );
-
-}
-
-function Home() {
-  return <h2>Home</h2>;
-}
-
-function Vote() {
-  return <h2>My Vote</h2>
-}
+  import {
+    ApolloClient,
+    InMemoryCache,
+    ApolloProvider,
+    createHttpLink,
+    from
+  } from "@apollo/client";
+  import { setContext } from '@apollo/client/link/context';
+  import { onError } from "@apollo/client/link/error";
 
 
-function CastedVote() {
-  return <h2>Cast Vote</h2>
-}
+  import {UserTweets} from './usertweets.js';
 
-function VotingPage() {
- return (
-   <div>
+  import CloudentityAuth from '@cloudentity/auth';
+  import authConfig from './authConfig.js';
+  import { useAuth } from './auth.js';
 
-      <VoteCount />
-      <CastVote />
-      <GetVote />
-   </div>
-   
- );
-}
-
-
-// <React.Fragment>
-//     <CastVote />
-//     <CastedVote />
-//   </React.Fragment>
-
-
-const GET_VOTE = gql `
-query {
-  getMyVote {
-      id
-      candidateId
-      voterId
-      districtId
-      stateId
-  }
-  getVote(id: "3c412454-b267-44c8-9b66-05e4a3784d10") {
-      id
-  }
-}
-`;
-
-export function GetVote() {
-  const {loading, error, data} = useQuery(GET_VOTE);
-
-  const  [ballotState, setBallotStatus] = useState(false);
-
-  if (loading) return <p>Loading..</p>;
-  if (error) return <p> Error ..</p>;
-
-  if(!ballotState && data != null && data.getMyVote != null) {
-    setBallotStatus(true);
-  }
-
-  if(ballotState) {
-    return (
-      <div>
-        <h2> Ballot Status </h2>
-
-        <p> Our records indicate that you have already exercised your ballot rights.
-          In case you want to modify the ballot, click on modify below.
-        </p>
-
-        {
-          Object.keys(data.getMyVote).map((k,i) => (
-            <div>Hi {i} {k} {data.getMyVote[k]} </div>
-          ))
-        }
-      </div>
-    );
-  }
-  return <BallotNotCast />;  
-
-}
-
-function BallotNotCast() {
-  return (
-    <div>
-        <h2> Ballot Status </h2>
-        <p> Our records indicate that you have not  exercised your ballot rights.
-          Please cast your ballot, it is your responsbility.
-        </p>
-    </div>
-  );
-}
+  import {HomePageContent} from './homePage.js';
 
 
 const httpLink = createHttpLink(
@@ -216,96 +77,30 @@ const client = new ApolloClient (
 
 
 
+function App() {
 
-function VoteCount(props) {
+  //const navigate = useNavigate();
+  const cloudentity = new CloudentityAuth(authConfig);
+  const [authenticated] = useAuth(cloudentity);
+  const accessTokenRaw = localStorage.getItem(authConfig.accessTokenName);
+  const auth = authenticated && accessTokenRaw;
+
   return (
-    <div>
-      <h2> Vote Count Status </h2>
-    </div>
-  );
-}
-
-const defaultValues = {
-  name: "",
-  age: 0,
-  gender: "",
-  os: "",
-  favoriteNumber: 0,
-};
-
-export function CastVote(props) {
-  
-    const  [formValues, setFormValues] = useState(defaultValues);
-  
-    const handleSliderChange = (name) => (e, value) => {
-      setFormValues({
-        ...formValues,
-        [name]: value,
-      });
-    };
-    
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      console.log(formValues);
-    };
-  
-  
-    const  handleInputChange = (e) => {
-      const { name, value } = e.target;
-      setFormValues({
-        ...formValues,
-        [name]: value,
-      });
-    };
-  
-  return (
-  <div>
-        <h2>Cast Vote</h2>
-        <form>
-        <Grid container alignItems="center" justify="center" direction="column">
-          <Grid item>
-              <p>Hi voter, as per our records you have not casted the ballot yet. Please
-                use the submission below to cast your vote.
-              </p>
-              <p>
-                Our records show following demographics details for your ballot. If there is 
-                any issue please contact a voting official for help.
-              </p>
-              <p>Name: {formValues.name} </p>
-              <p>State: {formValues.state} </p>
-              <p>County: {formValues.county} </p>
-              <p>Address: {formValues.address} </p>
-              <p>Type: {formValues.remote} </p>
-          </Grid>
-          <Grid item>
-              
-          </Grid>
-          <Grid item>
-            <FormControl component="fieldset">
-              <FormLabel component="legend">Choose a candidate</FormLabel>
-              <RadioGroup
-                aria-label="candidate"
-                defaultValue=""
-                name="radio-buttons-group"
-              >
-                <FormControlLabel value="Bob" control={<Radio />} label="Bob" />
-                <FormControlLabel value="Roy" control={<Radio />} label="Roy" />
-                <FormControlLabel value="Jack" control={<Radio />} label="Jack" />
-                <FormControlLabel value="Ryan" control={<Radio />} label="Ryan" />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
-          <Grid item>
-            <Button variant="contained" color="primary" type="submit">
-                Cast ballot
-            </Button>
-        </Grid>
-        </Grid>
-        </form>
+    <Router>
+      <div>
+        <Routes>
+          <Route path="/usertweet"  element={<UserTweets/>}>
+            
+          </Route>
+          <Route path="/usertweet1"  element={!auth ?<HomePageContent auth={auth} /> : <Navigate to='/usertweet' /> }></Route>
+          <Route path="/"  element={!auth ? <HomePageContent auth={auth} /> : <Navigate to='/usertweet' /> }>
+          </Route>
+        </Routes>
       </div>
+    </Router>
   );
-}
 
+}
 
 render(
   <ApolloProvider client={client}>
@@ -313,15 +108,6 @@ render(
   </ApolloProvider>,
   document.getElementById('root'),
 );
-
-
-
-//ReactDOM.render(
-//  <React.StrictMode>
-//    <App />
-//  </React.StrictMode>,
-//  document.getElementById('root')
-//);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

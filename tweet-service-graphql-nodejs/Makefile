@@ -46,3 +46,8 @@ deploy-istio-gateway:
 	helm install istio-ingressgateway istio/gateway -n istio-system -f istio-configs/istio-helm-config-override.yaml
 	kubectl apply -f istio-configs/istio-ingress-gateway-graphql.yaml -n istio-system
 	kubectl apply -f istio-configs/istio-ingress-virtual-service.yaml -n istio-system	
+
+# This will set up the cluster, deploys apps, istio and istio-gateway
+all:
+	make deploy-cluster deploy-app-graph-ns deploy-istio deploy-istio-gateway
+

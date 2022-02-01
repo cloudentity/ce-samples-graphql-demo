@@ -1,10 +1,9 @@
 import {Button, Stack} from '@mui/material';
 import {makeStyles} from '@mui/styles'
+import Tooltip from "@material-ui/core/Tooltip";
+
 import CloudentityAuth from '@cloudentity/auth';
 import authConfig from './authConfig.js';
-
-
-import Tooltip from "@material-ui/core/Tooltip";
 
 const useStyles = makeStyles({
     root: {
@@ -17,13 +16,12 @@ const useStyles = makeStyles({
     }
   });
 
-export const LoginButton = ({auth}) => {
+export const AuthButton = ({auth}) => {
 
-    const classes = useStyles();
+  const classes = useStyles();
 
   const handleAuth = () => {
     const scopes = 'all';
-    console.log("asdfsafdds##########");
     console.log(authConfig);
     const cloudentity = new CloudentityAuth({...authConfig, ...scopes});
     cloudentity.authorize();
@@ -35,15 +33,12 @@ export const LoginButton = ({auth}) => {
 
   return (
     <div className={classes.root} >
-      <Stack
-        className={classes.mainSection}
-        direction="column"
-        justifyContent="center"
-        alignItems="center"
-      >
+      <Stack className={classes.mainSection} direction="column" justifyContent="center" alignItems="center">
+        <p>If you want to see more than this, we need to identity and authorize you further.
         <h3>Let's get you in there!</h3>
+        </p>
         <Tooltip title="This will intiate OAuth authorization request with Cloudentity ACP" placement="top">
-          <Button className="AuthenticateButton" variant="contained" onClick={() => buttonOnClick()}>Authenticate</Button>
+          <Button className="AuthenticateButton" variant="contained" onClick={() => buttonOnClick()}>Authorize</Button>
         </Tooltip>
       </Stack>
     </div>

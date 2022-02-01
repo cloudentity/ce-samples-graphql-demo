@@ -33,6 +33,15 @@ to build apps.
 - [nodejs](https://nodejs.org/en/) - Recommended v16.0 +
 - [npm](https://docs.npmjs.com/getting-started) - Recommended v8.3.0 +
 
+---
+**NOTE**
+
+In case you are not interested in building the application from scratch, you can skip the below development
+section, checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and jump
+to the [Build and Deploy Section](#Deploy-and-Run-GraphQL-API-workload-in-Kubernetes-cluster)
+
+---
+
 
 ### Initialize the project
 
@@ -343,6 +352,16 @@ can be deployed using any tool of your choice, we will use `kind` for this appli
 
 ---
 
+### Level jump
+
+In case you want to skip the below items/details and want to next logical step with a shortcut, use
+
+```bash
+make all
+```
+
+This will deploy all resources and you can jump to the [Protect using Cloudentity authorization platform](#Authorization-Policy-administration-in-Cloudentity-authorization-platform)
+
 ### Build the docker image
 
 Let's build the docker image for GraphQL API using `make build-image`
@@ -482,7 +501,7 @@ Voila! Now the services should be accessible from outside the cluster. Now that 
 ## Authorization Policy administration in Cloudentity authorization platform
 
 * Sign up for a [free Cloudentity Authorization SaaS account](https://authz.cloudentity.io/register)
-* Set up a new workspace(aka OAuth authorization server) in the Cloudentity authorization Platform
+* [Set up a new workspace(aka OAuth authorization server) in the Cloudentity authorization Platform](https://docs.authorization.cloudentity.com/guides/workspace_admin/workspace/add_workspaces/?q=workspace)
 
 ![Cloudentity istio microperimeter authorization](acp-istio-authorization.jpeg)
 
@@ -490,7 +509,19 @@ Voila! Now the services should be accessible from outside the cluster. Now that 
 
 Cloudentity micropermeter authorizers can self discover API endpoints if annotated properly in a Kubernetes cluster. More details on discovery can be read here about [auto discovery of services on Istio](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/graphql/#graphql-api-discovery).
 
-For example, in the helm chart, we have annotated the services so that final Deployment resource file has the annotations. So the schema file for the service is being read from below location.
+For example, in the helm chart, we have annotated the services so that final Deployment resource file has the annotations. 
+So the schema file for the service is being read from below location. This annotation enables this schema to be read by
+Cloudentity Istio authorizers deployed onto a cluster and then the policies can be declaratively attached to the schema
+loaded into ACP and governed from there on.
+
+---
+**NOTE**
+
+The schema URL can be served by the GraphQL API resource server itself or hosted in separate accessible location, we are using 
+an external url only for demonstration purpose
+
+---
+
 
 ```yaml
 apiVersion: apps/v1
@@ -500,31 +531,35 @@ metadata:
   labels:
     {{- include "tweet-service-graphql-nodejs.labels" . | nindent 4 }}
   annotations:
-    services.k8s.cloudentity.com/spec-url: "https://pastebin.com/raw/zwJK5Kt4"
+    services.k8s.cloudentity.com/spec-url: "https://raw.githubusercontent.com/cloudentity/random-bin/master/graphql/tweet-svc-schema"
     services.k8s.cloudentity.com/graphql-path: "/graphql"
 ```
 
-This will enable these services to be auto discovered whenever Cloudentity Istio authorizers are deployed onto a cluster and is configured to scan the namespace on which the service is running.
 
-In case you want to change the annotation, you can update the url in the helm template and do the following
+In case you want to change the annotation, you can [update the url in the helm template](https://github.com/cloudentity/ce-samples-graphql-demo/blob/master/tweet-service-graphql-nodejs/helm-chart/tweet-service-graphql-nodejs/templates/deployment.yaml#L8) and do the following
 
 ```bash
 helm uninstall  svc-apps-graphql -n svc-apps-graph-ns
 helm install svc-apps-graphql helm-chart/tweet-service-graphql-nodejs -n svc-apps-graph-ns
 ```
 
-Make sure to check the service is still reachable.
+Make sure to check the service is still healthy and reachable.
 
 ### Download Istio authorizer microperimeter (Policy decision enforcer)
 
-Let's download the Cloudentity Istio authorizer microperimeter. This component will acts as the Policy Decision and Enforcement service in the local cluster. This component is also responsible
+Let's download the Cloudentity Istio authorizer microperimeter. The scope of responsibility of this component to act as the 
+local policy decision point within the Kubernetes cluster. This component is also responsible
 to pull down all the applicable enforcement rules from the Cloudentity authorization platform. 
 
-Higlighted in the box is the component that we will be downloading and installing onto a local Kuubernets cluster
+In the below image, the highlighted section in the box is the component that we will be downloading and installing onto a local Kuubernets cluster.
 
 ![Cloudentity istio microperimeter authorization](istio-authorizer.jpeg)
 
-In the Cloudentity authorization platform console, Go to `APIs >> Gateways` and register a new Istio authorizer. Naviagate to next tab and `Download package` to get all the required Kubernetes resource files.
+In the Cloudentity authorization admin console:
+* Go to `APIs >> Gateways` and register a new Istio authorizer
+* Navigate to next tab and `Download package` to get all the required Kubernetes resource files.
+
+[More details about the Istio authorizer can be found here](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/)
 
 ### Deploy Istio authorizer to the Kubernetes cluster
 
@@ -536,16 +571,25 @@ We will use the downloaded package to deploy the istio authorizer. Unzip the pac
 ---
 **NOTE**
 
-Authorizer that will be deployed to its own name space (in this case `acp-system`)
+Cloudentity Istio authorizer that will be deployed to its own name space (in this case `acp-system`)
 
 ---
 
 ![Cloudentity istio microperimeter authorization](istio-authorizer-namespaces.jpeg)
 
 
-Above `manifest` file from download package contains configuration to scan only the `default` namespace for services. In this case, the services are in a different namespace (i.e `svc-apps-graph-ns`) and hence we need to add the namespace onto the args to specific the namespace the `istio-authorizer` should scan to discover and protect the service, and then push that information back upto  Cloudentity authorization platform. Let's modify the downloaded `manifest.yaml` to include below args
+---
+**IMPORTANT**
 
-```
+Above `manifest` file from download package contains configuration to scan only the `default` namespace for services. In this case, the services are in a different namespace (i.e `svc-apps-graph-ns`) and hence we need to add the namespace onto the args to specific the namespace the `istio-authorizer` should scan to discover and protect the service, and then push that information back upto  Cloudentity authorization platform. 
+
+Cloudentity Istio authorizer that will be deployed to its own name space (in this case `acp-system`)
+
+---
+
+Let's modify the downloaded `manifest.yaml` to include `namespace` args
+
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 spec:
@@ -565,7 +609,7 @@ Now we are ready to install the `istio-authorizer` resources using the Kubernete
 from the the downloaded folder location or whereever you may have moved it.
 namespace
 
-```
+```bash
 kubectl apply -k .
 ```
 
@@ -574,7 +618,46 @@ comes up clean and healthy.
 
 Let's also add a request body parser sidecar for the pod, without this the micro-perimeter will not be able to interpret the GraphQL request body.
 
+---
+**IMPORTANT**
+
+Above `parse-body.yaml` file from download package contains configuration for the `default` namespace. In this case, the services are in a different namespace (i.e `svc-apps-graph-ns`) and hence we need to add the namespace onto the args to specific the namespace where this envoy filter sidecar needs to be attached
+
+---
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: acp-authorizer-with-body
+  namespace: svc-apps-graph-ns
+spec:
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: ANY
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+            subFilter:
+              name: "envoy.filters.http.ext_authz"
+    patch:
+      operation: MERGE
+      value:
+        name: envoy.filters.http.ext_authz
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+          with_request_body:
+            max_request_bytes: 8192
+            allow_partial_message: true
+            pack_as_bytes: true
+
 ```
+
+Once it is updated, let's apply the k8s resource
+
+```bash
 kubectl apply -f parse-body.yaml
 ```
 
@@ -606,7 +689,7 @@ Make sure the traffic path is allowed in case you see the pod status as not heal
 
 ---
 
-After this step we should see the API's pop up in the Cloudentity ACP SaaS platform. Let's check it out in the Cloudentity authorization platform.
+After this step we should see the API's auto discovered by the Cloudentity authorizer and propagated back upto the the Cloudentity Authorization SaaS platform. Let's check it out in the Cloudentity authorization platform.
 
 * **Istio authorizer and Cloudentity ACP SaaS platform communication**
 
@@ -789,13 +872,11 @@ query from the [imported Postman Test collection](https://www.getpostman.com/col
 
 Modify the request payload to include/exclude `dateModified` in the query and observe the response difference.
 Whenever `dateModified` is requested, the request is automatically rejected.
-
  
 | Authorization policy | Output |
 | --- | ----------- |
 | ![alt-text-1](date-modified-enforce.png "title-1") |  ![alt-text-2](api-field-date-modified-absent.png "title-2") |
 | ![alt-text-1](date-modified-enforce.png "title-1") | ![alt-text-2](api-field-date-modified-present.png "title-2") |
-
 
 
 ### Scenario#3: Disallow GraphQL queries for specific objects with constraints 
@@ -882,4 +963,3 @@ Now that we have protected a GraphQL API resource server with dynamic and flexib
 a simple GraphQL client application to demonstrate an entire application in real life. In this client application, we will
 look at how to get an accessToken from Cloudentity authorization server and then utilize it to make further calls
 to GraphQL API resource server.
-

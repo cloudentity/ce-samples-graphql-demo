@@ -1,22 +1,10 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
 import './index.css';
-import { render } from 'react-dom';
-import { setContext } from '@apollo/client/link/context';
 
 import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
   useQuery,
-  createHttpLink,
   gql
 } from "@apollo/client";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link } from "react-router-dom";
 
 
 const FETCH_LATEST_TWEETS = gql `
