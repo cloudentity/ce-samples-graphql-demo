@@ -27,7 +27,7 @@ The Cloudentity authorization platform will enable
 * Application developers to decouple hard-to-audit local enforcement rules and move them to a centralized location
 * Application developers can manage, govern and enforce the externalized authorization rules independently of the application development
 * Application to transitively support advanced data authorization requirements, including RBAC (Role based access control), ABAC (Attribute based access control) style models, without any modification to application code
-* Applications to be readily complaint with emerging data standards like OpenBanking, OpenEnergy, OpenInsurance etc. in terms of data sharing and privacy controls
+* Applications to be readily compliant with emerging data standards like OpenBanking, OpenEnergy, OpenInsurance etc. in terms of data sharing and privacy controls
 * Application security engineers to have more visibility to platforms that are requesting data and enforce conditional policies to restrict based on conditions
 * Applications to define and maintain all the authorization rules to be enforced as policies that will allow policy approval, review and other governance process 
 * Application authorization policies to be defined in declarative format, which can be propagated across environments using modern CI/CD and devops pipelines
