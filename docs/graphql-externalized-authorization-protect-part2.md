@@ -591,13 +591,6 @@ spec:
 ...
 ```
 
----
-**IMPORTANT**
-
-The snippet above will only work with an `istio-authorizer` Docker image version set to `2.0.0-9` or higher. Double-check the version in the `manifest` file download, and change it to `2.0.0-9` if it is lower.
-
----
-
 Now we are ready to install the `istio-authorizer` resources using the Kubernetes kustomization file in the provided package. Make sure that you are running this command
 from the the downloaded folder location or wherever you may have moved it.
 namespace
