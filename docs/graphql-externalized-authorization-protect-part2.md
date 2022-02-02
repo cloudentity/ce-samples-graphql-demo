@@ -373,7 +373,7 @@ Let's launch the kind cluster using below command:
 
 We will use `helm` to define and deploy all the Kubernetes resources required for the application. We will not be going into the helm details, but [you can find all the helm templates already in the repo].
 
-Using below `make` command, we will upload the image to kind cluster, create a Kubernetes namespace and deploy the GraphQL app. 
+Using below `make` command, we will upload the image to kind cluster, create a Kubernetes namespace and deploy the GraphQL app.
 
 ```bash
 make deploy-app-graph-ns
@@ -557,8 +557,8 @@ Cloudentity Istio authorizer that will be deployed to its own name space (in thi
 
 ---
 
-Let's modify the downloaded `manifest.yaml` to include `namespace` args. Below provided block is just a snippet, so edit the downloaded file
-in place and adjust only the `namespace` argument
+Let's modify the downloaded `manifest.yaml` to include `DISCOVERY_NAMESPACES` environment variable. Below provided block is just a snippet, so edit the downloaded file
+in place and add only the `DISCOVERY_NAMESPACES` argument to the list of `env` variables:
 
 ```yaml
 apiVersion: apps/v1
@@ -581,16 +581,22 @@ spec:
     spec:
       serviceAccountName: istio-authorizer
       containers:
-        - image: docker.cloudentity.io/istio-authorizer:2.0.0-8
+        - image: docker.cloudentity.io/istio-authorizer:2.0.0-9
           imagePullPolicy: IfNotPresent
           name: istio-authorizer
-          args:
-          - --namespace
-          - svc-apps-graph-ns
           env:
+          - name: "DISCOVERY_NAMESPACES"
+            value: "svc-apps-graph-ns"
 ...
 ...
 ```
+
+---
+**IMPORTANT**
+
+The snippet above will only work with an `istio-authorizer` Docker image version set to `2.0.0-9` or higher. Double-check the version in the `manifest` file download, and change it to `2.0.0-9` if it is lower.
+
+---
 
 Now we are ready to install the `istio-authorizer` resources using the Kubernetes kustomization file in the provided package. Make sure that you are running this command
 from the the downloaded folder location or wherever you may have moved it.
@@ -676,11 +682,11 @@ Make sure the traffic path is allowed in case you see the pod status as not heal
 
 ---
 
-After this step we should see the APIs auto discovered by the Cloudentity authorizer and propagated back upto the the Cloudentity Authorization SaaS platform. Let's check it out in the Cloudentity authorization platform.
+After this step we should see the APIs auto discovered by the Cloudentity authorizer and propagated back up to the the Cloudentity Authorization SaaS platform. Let's check it out in the Cloudentity authorization platform.
 
 * **Istio authorizer and Cloudentity ACP SaaS platform communication**
 
-It is very important that the communication path between the local Istio authorizer and Cloudentity ACP SaaS platform is established. The local istio authorizer is
+It is very important that the communication path between the local Istio authorizer and Cloudentity ACP SaaS platform is established. The local Istio authorizer is
 responsible for pushing any discovered services to platform for further governance. Once pushed, the centralized policies administered and managed in the platform
 are polled back by the authorizer for policy decisions and enforcement locally.
 
