@@ -92,7 +92,7 @@ Once a policy is authored using above data elements, it can be attached to any o
 
  * GraphQL Schema Annotation
 
- Development teams can also consider bottom-up approach to annotate the schema directly and bypassing the Cloudentity GraphQL API explorer screen. Cloudentity platform will automatically detect such directives within the schema and then display accordingly in the API explorer.
+ Development teams can also consider a bottom-up approach to annotate the schema directly by bypassing the Cloudentity GraphQL API explorer screen. Cloudentity platform will automatically detect such directives within the schema and then display accordingly in the API explorer.
 
  ![Cloudentity graphQL schema annotation](schema-level-annotation.png)
 
@@ -106,7 +106,7 @@ Once a policy is authored using above data elements, it can be attached to any o
 
 ### Externalized Authorization Runtime enforcement
 
-The Cloudentity authorization platform utilizes open standards and uses the OAuth specification as the basis for authorization and access to resources. Adhering to the OAuth specification, GraphQL implementation is considered as an OAuth Resource server, and it can be protected as such in the Cloudentity authorization platform. So, applications (mobile apps, terminal apps, web apps etc.) acting as OAuth client applications need to first obtain an access Token from the Cloudentity Authorization server. Also note that Cloudentity also supports access Tokens from other Authorization servers, which Cloudentity will internally exchange for its own access Token at the edge level without the application making any change.
+The Cloudentity authorization platform utilizes open standards and uses the OAuth specification as the basis for authorization and access to resources. Adhering to the OAuth specification, our GraphQL implementation is considered as an OAuth Resource server, that can be protected as such in the Cloudentity authorization platform. So, applications (mobile apps, terminal apps, web apps etc.) acting as OAuth client applications need to first obtain an access Token from the Cloudentity Authorization server. Cloudentity also supports access Tokens from other Authorization servers, which Cloudentity will internally exchange for its own access Token at the edge level without the application making any change.
 
 The Cloudentity authorization platform securely and automatically distributes the policy rule to all the runtime enforcement components, regularly referred as policy decision points. Cloudentity offers various enforcers in the form of sidecars, plugins, lambda etc. based on deployment platform to enforce runtime access protection. Cloudentity enforcement points, also known as Micro Perimeter authorizers, are available for most of the widely adopted application deployment patterns and can be seamlessly plugged into deployment architectures to enforce authorization decisions.
 
