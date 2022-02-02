@@ -14,14 +14,14 @@ demonstration. The goal was to build a GraphQL server and have its endpoint prot
 We then deployed this application to a native Kubernetes cluster using `kind` and enforced centralized
 and decoupled authorization without changing any business logic or code. See the previous article for all the details.
 
-As a recap, take a peek at below diagram to remind ourselves of what we built in previous article and the new consumer application that we will be building in this article
-and how all these pieces would eventually be working together.
+As a recap, take a peek at the diagram below as a reminder of what we built in the previous article vs. the new consumer application that we will be building in this article,
+and how all these pieces will eventually work together.
 
 ![Graphql-client-operations](graphql-resource-consume.jpeg)
 
 ## Build a single page React app with Nodejs
 
-We will be building a `tweet-ui` React based application with attached components. [Full source code for this demo application 
+We will be building a `tweet-ui` React based application with attached components. [Full source code for this demo application
 can be found here](https://github.com/cloudentity/ce-samples-graphql-demo/tree/master/tweet-ui-graphql-react)
 
 ![Graphql-client-operations](tweet-ui-components.jpeg)
@@ -29,7 +29,7 @@ can be found here](https://github.com/cloudentity/ce-samples-graphql-demo/tree/m
 ---
 **SKIP/JUMP LEVEL**
 
-In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and `cd tweet-ui-graphql-react` and then go 
+In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and `cd tweet-ui-graphql-react` and then go
 to [Run the application](#run-the-application)
 
 ---
@@ -56,7 +56,7 @@ And install required packages
 
 ```bash
 npm install --save react-router-dom
-npm install --save @apollo/client graphql
+npm install --save @apollo/client graphql@15.3.0
 npm install --save @mui/material @emotion/react @emotion/styled @mui/icons-material
 npm install --save @cloudentity/auth
 ```
@@ -77,6 +77,8 @@ the Cloudentity Auth sdk to handle OAuth authorization (code => token exchange),
 setting of the `accessToken`. If an `accessToken` is not available in the local storage, user
 will be redirected to the page where they can see the `authorize` button and contents that
 do not require authorized tokens.
+
+In `index.js`, located in the `src` directory of the app, we'll add:
 
 ```js
 function App() {
@@ -104,7 +106,7 @@ function App() {
 
 ```
 
-So as you can see the public page is at `HomePageContent` that is server by `homepage.js` and let's dive into that
+So as you can see the public page is at `HomePageContent` that is served by `homepage.js`. Let's dive into that
 snippet for some explanation.
 
 #### Homepage
@@ -246,12 +248,12 @@ export function GetLatestTweets() {
 }
 ```
 
-So now we have a homepage, that let's prompt the user to authorize to fetch an authorization token to call more
-resource server API's, as well as it makes a call to publicly exposed GraphQL api resource endpoint.
+So now we have a homepage that prompts the user to authorize, resulting in an authorization token to call more
+resource server APIs, as well as making a call to a publicly exposed GraphQL API resource endpoint.
 
-#### Getting authorization token from Cloudentity
+#### Getting an authorization token from Cloudentity
 
-We will use the [Cloudentity OAuth JS SDK](https://github.com/cloudentity/cloudentity-auth-js) to perform an OAuth handshake with Cloudentity authorization platform and fetch an authorizationToken. 
+We will use the [Cloudentity OAuth JS SDK](https://github.com/cloudentity/cloudentity-auth-js) to perform an OAuth handshake with Cloudentity authorization platform and fetch an authorizationToken.
 
 `authButton.js`
 
@@ -292,7 +294,7 @@ export const AuthButton = ({auth}) => {
 
 `authConfig.ts`
 
-This file contains the configuration required to handshake with Cloudentity authorization platform to obtain an accessToken. For getting an accessToken, [follow this Cloudentity article to register a client
+This file contains the configuration required to handshake with the Cloudentity authorization platform to obtain an `accessToken`. For getting an accessToken, [follow this Cloudentity article to register a client
 application in Cloudentity authorization platform](https://docs.authorization.cloudentity.com/guides/developer/protect/application/) and populate the details in this configuration based on that.
 
 ```js
