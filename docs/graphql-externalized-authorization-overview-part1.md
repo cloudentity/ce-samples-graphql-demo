@@ -86,7 +86,7 @@ Once a policy is authored using above data elements, it can be attached to any o
 
  * Cloudentity GraphQL API explorer
 
- Authorization policies are attached via the Cloudentity GraphQL API explorer screen to GraphQL constructs loaded from the GraphQL schema; once attached the modified schema with directives can be exported for source control using JSON/YAML formats and propagated to higher environments. The exported file is a decorated GraphQL schema with @auth directives. This allows rapid development, source control and deployment of verified authorization policies to environments through modern deployment pipelines..
+ Authorization policies are attached via the Cloudentity GraphQL API explorer screen to GraphQL constructs loaded from the GraphQL schema. Once attached, the modified schema with directives can be exported for source control using JSON/YAML formats and propagated to higher environments. The exported file is a decorated GraphQL schema with @auth directives. This allows rapid development, source control and deployment of verified authorization policies to environments through modern deployment pipelines.
 
 ![Cloudentity graphQL API explorer](ce-graphql-api-explorer.png)
 
