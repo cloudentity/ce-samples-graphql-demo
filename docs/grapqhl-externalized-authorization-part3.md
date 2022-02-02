@@ -23,7 +23,7 @@ and decoupled authorization without changing any business logic or code. See the
 ---
 **SKIP/JUMP LEVEL**
 
-In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and `cd tweet-ui-graphql-react` and then go 
+In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and `cd tweet-ui-graphql-react` and then go
 to [Run the application](#run-the-application)
 
 ---
@@ -50,7 +50,7 @@ And install required packages
 
 ```bash
 npm install --save react-router-dom
-npm install --save @apollo/client graphql
+npm install --save @apollo/client graphql@15.3.0
 npm install --save @mui/material @emotion/react @emotion/styled @mui/icons-material
 npm install --save @cloudentity/auth
 ```
@@ -245,7 +245,7 @@ resource server API's, as well as it makes a call to publicly exposed GraphQL ap
 
 #### Getting authorization token from Cloudentity
 
-We will use the [Cloudentity OAuth JS SDK](https://github.com/cloudentity/cloudentity-auth-js) to perform an OAuth handshake with Cloudentity authorization platform and fetch an authorizationToken. 
+We will use the [Cloudentity OAuth JS SDK](https://github.com/cloudentity/cloudentity-auth-js) to perform an OAuth handshake with Cloudentity authorization platform and fetch an authorizationToken.
 
 `authButton.js`
 
