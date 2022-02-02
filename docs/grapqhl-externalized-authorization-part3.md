@@ -10,7 +10,7 @@ and send the authorization token to underlying GraphQL services.
 
 ![Graphql-client-operations](tweet-ui-components.jpeg)
 
-## Build a single page React app with with Nodejs (see article 2 in this series)
+## Build a single page React app with Nodejs
 
 In the previous article, we built the GraphQL server with Node.js, `express`, `graphql` and `loki` as a built-in database for this
 demonstration. The goal was to build a GraphQL server and have its endpoint protected.
@@ -18,30 +18,35 @@ demonstration. The goal was to build a GraphQL server and have its endpoint prot
 We then deployed this application to a native Kubernetes cluster using `kind` and enforced centralized
 and decoupled authorization without changing any business logic or code. See the previous article for all the details.
 
-Full source code can be found at: <>
+[Source code for the React application](https://github.com/cloudentity/ce-samples-graphql-demo/tree/master/tweet-ui-graphql-react)
+
+---
+**SKIP/JUMP LEVEL**
+
+In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and `cd tweet-ui-graphql-react` and then go 
+to [Run the application](#run-the-application)
+
+---
 
 ### Pre-requsisites
 
 We will be using `react` for the application development.
 
 ```bash
-- [npm] (https://docs.npmjs.com/getting-started) - Recommended v8.3.0 +
+- [npm](https://docs.npmjs.com/getting-started) - Recommended v8.3.0 +
 ```
 
-### Create a new react app
+### Initialize React app
 
 ```bash
-npx create-react-app tweet-ui-graph-s1
+npx create-react-app tweet-ui-graphql-react
 ```
 
-Reference: https://reactjs.org/docs/create-a-new-react-app.html
+And install required packages
 
-### Install required packages
-
-We will use following packages for this application
-* mui => Material ui for icons, styles, fonts(https://mui.com/getting-started/installation/)
-* react => core react functions
-* cloudentity/auth => cloudentity sdk to fetch and store OAuth accessTokens
+* mui - [Material ui for icons, styles, fonts](https://mui.com/getting-started/installation/)
+* react - core react functions
+* cloudentity/auth - Cloudentity JS sdk to fetch and store OAuth accessTokens
 
 ```bash
 npm install --save react-router-dom
@@ -50,7 +55,7 @@ npm install --save @mui/material @emotion/react @emotion/styled @mui/icons-mater
 npm install --save @cloudentity/auth
 ```
 
-### Define the react components
+### Define React components
 
 #### Routing
 
@@ -104,9 +109,9 @@ snippet for some explanation.
 
 #### Configure GraphQL API client
 
-We need to configure the GraphQL API client to send in an authorization token (if available) in the browser's local storage.
-If not, it will make GrpahQL API calls without this authorization token . More details and explanation
-about usage of apollo client can be found here https://www.apollographql.com/docs/react/why-apollo/
+We need to configure the GraphQL API client to send in an authorization token (if available) retrieved from the browser's local storage.
+If not, it will make GrpahQL API calls without this authorization token . [More details and explanation
+about usage of apollo client can be found here](https://www.apollographql.com/docs/react/why-apollo/)
 
 ```js
 import {
@@ -162,9 +167,9 @@ const client = new ApolloClient (
 
 ```
 
-### Invoking GraphQL API's
+### Invoking GraphQL APIs
 
-For invoking GraphQL API's we will be using the Apollo client configured above
+For invoking GraphQL APIs we will utilize the Apollo client configured above
 
 ```js
 
@@ -240,8 +245,7 @@ resource server API's, as well as it makes a call to publicly exposed GraphQL ap
 
 #### Getting authorization token from Cloudentity
 
-For this exercise, we will use an sdk provided by Cloudentity to perform an OAuth handshake with ACP
-and fetch an authorizationToken. More detaila about the sdk can be found here..
+We will use the [Cloudentity OAuth JS SDK](https://github.com/cloudentity/cloudentity-auth-js) to perform an OAuth handshake with Cloudentity authorization platform and fetch an authorizationToken. 
 
 `authButton.js`
 
@@ -282,8 +286,8 @@ export const AuthButton = ({auth}) => {
 
 `authConfig.ts`
 
-This file is the configuration of the remote Cloudentity authorization platform. As you can see, we have defined some OAuth `scopes`
-for this application and to
+This file contains the configuration required to handshake with Cloudentity authorization platform to obtain an accessToken. For getting an accessToken, [follow this Cloudentity article to register a client
+application in Cloudentity authorization platform](https://docs.authorization.cloudentity.com/guides/developer/protect/application/) and populate the details in this configuration based on that.
 
 ```js
 const authConfig = {
@@ -309,25 +313,25 @@ export default authConfig;
 
 * Proxy to eliminate CORS error
 
+By default you will run into CORS error as the GraphQL APIs are served on a different host/port. To eliminate this we will use the React dev proxy to proxy all requests to GraphQL API server.
+
 `package.json`
 
 ```json
 {
-..
   "proxy": "http://localhost:5001",
-..
 }
 ```
 
-* Test the application
+### Run the application
+
+```
+npm start
+```
 
 ```js
 http://localhost:3001
 ```
-
-* Protected resource API's in k8s cluster.
-
-Now that in previous article, we have an endpoint to call, let's see the whole application in action.
 
 
 ### Conclusion

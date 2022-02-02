@@ -24,23 +24,18 @@ You can checkout this entire [demo application and related integration source he
 
 ## Build the GraphQL server application
 
-In case, you don't want to build the entire application but want to just use the pre-built docker image,
-jump to [Section protect]
-
 ### Pre-requisites
 
-Following tools are required as pre-requisites to build this application. `nodejs` was picked for its simplicity
-to build apps.
+Following tools are required to build this application. `nodejs` was picked for its simplicity to build apps.
 
 - [nodejs](https://nodejs.org/en/) - Recommended v16.0 +
 - [npm](https://docs.npmjs.com/getting-started) - Recommended v8.3.0 +
 
 ---
-**NOTE**
+**SKIP/JUMP LEVEL**
 
-In case you are not interested in building the application from scratch, you can skip the below development
-section, checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and jump
-to the [Build and Deploy Section](#Deploy-and-Run-GraphQL-API-workload-in-Kubernetes-cluster)
+In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and jump
+to the [Build and Deploy Section](#deploy-and-run-graphql-api-workload-in-kubernetes-cluster)
 
 ---
 
@@ -307,33 +302,15 @@ var resolverRoot = {
 * **Verify all GraphQL API operations**
 
 Navigate to the imported collection in Postman and run rest of the GraphQL endpoints. These
-should now return responses similar to below attached samples:
+should now return responses similar to below attached samples. At this point the GraphQL API application is **completely unprotected** and data can be requested or posted without authorization.
 
 ![Graphql-api-responses](graphql-sample-responses.jpeg)
-
----
-**NOTE**
-
-Note that at this point the application is **completely unprotected** and anyone can post/request data without authorization.
-
----
-
 
 
 ### Deploy and Run GraphQL API workload in Kubernetes cluster
 
 Let's deploy the GraphQL API onto a local Kubernetes cluster to enforce **externalized
-authorization policies with the Cloudentity platform** without modifying the application code at all.
-
-### Pre-requisites
-
-Local Kubernetes cluster
-can be deployed using any tool of your choice, we will use `kind` for this application.
-
-* [docker](https://docs.docker.com/get-docker/)
-* [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-* [helm](https://helm.sh/docs/helm/helm_install/)
-* [kubectl](https://kubernetes.io/docs/tasks/tools/)
+authorization policies with the Cloudentity authorization platform** without any modification to the application code.
 
 ---
 **NOTE**
@@ -343,26 +320,39 @@ can be deployed using any tool of your choice, we will use `kind` for this appli
 
 ---
 
-### Level jump
+### Pre-requisites
 
-In case you want to skip the below items/details and want to next logical step with a shortcut, use
+Local Kubernetes cluster
+can be deployed using any tool of your choice, but we will use `kind` in this article.
 
-```bash
-make all
-```
+* [docker](https://docs.docker.com/get-docker/)
+* [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+* [helm](https://helm.sh/docs/helm/helm_install/)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
-This will deploy all resources and you can jump to the [Protect using Cloudentity authorization platform](#Authorization-Policy-administration-in-Cloudentity-authorization-platform)
+---
+**SKIP/JUMP LEVEL**
+
+> In case you want to skip some of the deployment detailed steps and want to move to next logical step with a shortcut, use
+>```bash
+> make all
+> ```
+>
+> This will deploy all resources and you can jump to the [Protect using Cloudentity authorization platform](#authorization-policy-administration-in-cloudentity-authorization-platform)
+
+---
 
 ### Build the docker image
 
 Let's build the docker image for GraphQL API using `make build-image`
 
-### Launch the kubenertes cluster
+### Launch the Kubernetes cluster
 
-Let's launch a `kind` cluster and deploy the app. We will pass in a cluster config to expose a `NodePort` outside of
-the cluster for access at port `5001` since do not have an actual load balancer.
+We will create a Kubernetes cluster using `kind`. Below cluster config will be used to
+create the cluster and within the config, a `NodePort` is configured to enable accessibility
+at port `5001` from outside of the cluster since do not have an actual load balancer.
 
-Contents of k8s-cluster-config.yaml
+`k8s-cluster-config.yaml`
 
 ```yaml
 kind: Cluster
@@ -375,27 +365,24 @@ nodes:
     protocol: TCP
 ```
 
-Let's launch the kind cluster using the command in `Makefile`:
+Let's launch the kind cluster using below command:
 
 `make deploy-cluster`
 
-Once complete, you can see the cluster details using `kind get clusters`
-
 ### Deploy GraphQL app on the Kubernetes cluster
 
-We will use helm to define and deploy all the Kubernetes resources required for the application. We will not be
-going into the helm details, [you can find all the helm templates already in the repo].
+We will use `helm` to define and deploy all the Kubernetes resources required for the application. We will not be going into the helm details, but [you can find all the helm templates already in the repo].
 
-Let's upload the image to kind cluster, create a Kubernetes namespace and deploy the GraphQL app. This all
-can be done running the `make` command below.
+Using below `make` command, we will upload the image to kind cluster, create a Kubernetes namespace and deploy the GraphQL app. 
 
-`make deploy-app-graph-ns`
+```bash
+make deploy-app-graph-ns
+```
 
 Above make target will launch all the pods and services to run the GraphQL app. The status of the pods and services can be fetched using:
 
 ```bash
 kubectl get pods -n svc-apps-graph-ns
-
 kubectl get services -n svc-apps-graph-ns
 ```
 
@@ -423,7 +410,7 @@ curl --location --request POST 'http://local.cloudentity.com:5001/graphql' \
 }
 ```
 ---
-**NOTE**
+**NETWORK ACCESS**
 
 The components deployed on the Kubernetes cluster are not exposed outside the Kubernetes cluster. External access to individual services can be provided by creating an external load balancer or node port on each service. An Ingress Gateway resource can be created to allow external requests through the Istio Ingress Gateway to the backing services.
 
@@ -528,31 +515,25 @@ metadata:
 In case you want to change the annotation, you can [update the url in the helm template](https://github.com/cloudentity/ce-samples-graphql-demo/blob/master/tweet-service-graphql-nodejs/helm-chart/tweet-service-graphql-nodejs/templates/deployment.yaml#L8) and do the following
 
 ```bash
-helm uninstall  svc-apps-graphql -n svc-apps-graph-ns
+helm uninstall svc-apps-graphql -n svc-apps-graph-ns
 helm install svc-apps-graphql helm-chart/tweet-service-graphql-nodejs -n svc-apps-graph-ns
 ```
 
-Make sure to check the service is still healthy and reachable.
-
 ### Download Istio authorizer microperimeter (Policy decision enforcer)
 
-Let's download the Cloudentity Istio authorizer microperimeter. The scope of responsibility of this component to act as the
-local policy decision point within the Kubernetes cluster. This component is also responsible
-to pull down all the applicable enforcement rules from the Cloudentity authorization platform.
+In this step, we will download and configure the Cloudentity Istio authorizer microperimeter. The scope of responsibility of this component is to act as the local policy decision point within the Kubernetes cluster. This component is also responsible to pull down all the applicable authorization policies authored and managed within the remote the Cloudentity authorization platform.
 
 In the below image, the highlighted section in the box is the component that we will be downloading and installing onto a local Kuubernets cluster.
 
 ![Cloudentity istio microperimeter authorization](istio-authorizer.jpeg)
 
-In the Cloudentity authorization admin console:
+[Download the Istio package using](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/):
 * Go to `APIs >> Gateways` and register a new Istio authorizer
 * Navigate to next tab and `Download package` to get all the required Kubernetes resource files.
 
-[More details about the Istio authorizer can be found here](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/)
-
 ### Deploy Istio authorizer to the Kubernetes cluster
 
-We will use the downloaded package to deploy the istio authorizer. Unzip the package and you will find various k8s resources that is required to deploy the istio authorizer service onto the platform along with the communication secrets to the Cloudentity authorization platform.
+We will use the above downloaded package to deploy the Istio authorizer. Unzip the package and you will find various k8s resources that is required to deploy the Istio authorizer service onto the local cluster along with the communication secrets for the Cloudentity authorization platform.
 * manifest.yaml
 * kustomization.yaml
 * parse-body.yaml
