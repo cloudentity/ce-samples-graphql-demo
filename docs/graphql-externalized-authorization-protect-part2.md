@@ -13,12 +13,14 @@ modern application protection hybrid model with local enforcement and Cloud base
 ## Overview 
 
 We will build the graphQL API server with `express-graphql` and `lokijs` as a built in database.
-The sample business application is a tweet service that serves and consumes data as 
+Our application would be a tweet service that serves and consumes data exposed through APIs as 
 per GraphQL specification. Once we build the application, we will deploy it to a local 
 kubernetes cluster using `kind` and enforce centralized and decoupled policy based authorization without 
 modifying any business logic or code.
 
-Full source code can be found at: <>
+![Cloudentity istio microperimeter authorization](acp-workload-protect-overview.jpeg)
+
+[Source code for the application](https://github.com/cloudentity/ce-samples-graphql-demo)
 
 ## Build the GraphQL server application
 
