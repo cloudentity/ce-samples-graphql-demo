@@ -8,17 +8,23 @@ and send the authorization token to underlying GraphQL services.
 * Part 2: Build a GraphQL server with Node.js and protect with the Cloudentity authorization platform
 * Part 3. Build a GraphQL client react application to consume GraphQL server resources protected with the Cloudentity authorization platform
 
-![Graphql-client-operations](tweet-ui-components.jpeg)
-
-## Build a single page React app with Nodejs
-
 In the previous article, we built the GraphQL server with Node.js, `express`, `graphql` and `loki` as a built-in database for this
 demonstration. The goal was to build a GraphQL server and have its endpoint protected.
 
 We then deployed this application to a native Kubernetes cluster using `kind` and enforced centralized
 and decoupled authorization without changing any business logic or code. See the previous article for all the details.
 
-[Source code for the React application](https://github.com/cloudentity/ce-samples-graphql-demo/tree/master/tweet-ui-graphql-react)
+As a recap, take a peek at below diagram to remind ourselves of what we built in previous article and the new consumer application that we will be building in this article
+and how all these pieces would eventually be working together.
+
+![Graphql-client-operations](graphql-resource-consume.jpeg)
+
+## Build a single page React app with Nodejs
+
+We will be building a `tweet-ui` React based application with attached components. [Full source code for this demo application 
+can be found here](https://github.com/cloudentity/ce-samples-graphql-demo/tree/master/tweet-ui-graphql-react)
+
+![Graphql-client-operations](tweet-ui-components.jpeg)
 
 ---
 **SKIP/JUMP LEVEL**
