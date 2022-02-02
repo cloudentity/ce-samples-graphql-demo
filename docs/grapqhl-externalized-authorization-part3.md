@@ -72,6 +72,8 @@ setting of the `accessToken`. If an `accessToken` is not available in the local 
 will be redirected to the page where they can see the `authorize` button and contents that
 do not require authorized tokens.
 
+In `index.js`, located in the `src` directory of the app, we'll add:
+
 ```js
 function App() {
 
@@ -98,7 +100,7 @@ function App() {
 
 ```
 
-So as you can see the public page is at `HomePageContent` that is server by `homepage.js` and let's dive into that
+So as you can see the public page is at `HomePageContent` that is served by `homepage.js`. Let's dive into that
 snippet for some explanation.
 
 #### Homepage
@@ -240,10 +242,10 @@ export function GetLatestTweets() {
 }
 ```
 
-So now we have a homepage, that let's prompt the user to authorize to fetch an authorization token to call more
-resource server API's, as well as it makes a call to publicly exposed GraphQL api resource endpoint.
+So now we have a homepage that prompts the user to authorize, resulting in an authorization token to call more
+resource server APIs, as well as making a call to a publicly exposed GraphQL API resource endpoint.
 
-#### Getting authorization token from Cloudentity
+#### Getting an authorization token from Cloudentity
 
 We will use the [Cloudentity OAuth JS SDK](https://github.com/cloudentity/cloudentity-auth-js) to perform an OAuth handshake with Cloudentity authorization platform and fetch an authorizationToken.
 
