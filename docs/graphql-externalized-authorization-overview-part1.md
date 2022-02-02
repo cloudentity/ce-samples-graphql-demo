@@ -22,16 +22,20 @@ The Cloudentity authorization platform provides a centralized, externalized and 
 
 ## How does the Cloudentity authorization platform enable application teams?
 
-The Cloudentity authorization platform will enable
-* Application developers to eliminate embedding data authorization into GraphQL business logic
-* Application developers to decouple hard-to-audit local enforcement rules and move them to a centralized location
-* Application developers can manage, govern and enforce the externalized authorization rules independently of the application development
-* Application to transitively support advanced data authorization requirements, including RBAC (Role based access control), ABAC (Attribute based access control) style models, without any modification to application code
-* Applications to be readily compliant with emerging OpenData standards like OpenBanking, OpenEnergy, OpenInsurance etc. in terms of data sharing and privacy controls
+The Cloudentity authorization platform enables Application developers to:
+* Eliminate embedding data authorization into GraphQL business logic
+* Decouple hard-to-audit local enforcement rules and move them to a centralized location
+* Manage, govern and enforce the externalized authorization rules independently of the application development
+
+It enables applications to:
+* Transitively support advanced data authorization requirements, including RBAC (Role based access control), ABAC (Attribute based access control) style models, without any modification to application code
+* Readily comply with data sharing and privacy controls in emerging OpenData standards such as OpenBanking, OpenEnergy, OpenInsurance and more.
+* Define and maintain all the authorization rules to be enforced as policies that will allow policy approval, review and other governance process
+* Utilize "Authorization as a service" offering either from Cloud or hybrid or on prem model
+
+The Cloudentity authorization platform enables:
 * Application security engineers to have more visibility to platforms that are requesting data and enforce conditional policies to restrict based on conditions
-* Applications to define and maintain all the authorization rules to be enforced as policies that will allow policy approval, review and other governance process
 * Application authorization policies to be defined in declarative format, which can be propagated across environments using modern CI/CD and devops pipelines
-* Applications to utilize "Authorization as a service" offering either from Cloud or hybrid or on prem model
 
 ## GraphQL vs REST API authorization
 
