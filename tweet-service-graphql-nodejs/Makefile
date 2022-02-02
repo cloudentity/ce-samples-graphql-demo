@@ -49,5 +49,5 @@ deploy-istio-gateway:
 
 # This will set up the cluster, deploys apps, istio and istio-gateway
 all:
-	make deploy-cluster deploy-app-graph-ns deploy-istio deploy-istio-gateway
+	make build-image deploy-cluster deploy-app-graph-ns deploy-istio deploy-istio-gateway
 
