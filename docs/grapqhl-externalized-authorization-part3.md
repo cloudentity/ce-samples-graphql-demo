@@ -1,16 +1,16 @@
 # Build a GraphQL client application to consume protected GraphQL API resources
 
-This article is part 3 of our GraphQL application protection series. In this article, we will build a GraphQL client 
+This article is part 3 of our GraphQL application protection series. In this article, we will build a GraphQL client
 that is capable of invoking GraphQL API calls, obtain authorized accessTokens from a Cloudentity authorization server
 and send the authorization token to underlying GraphQL services.
 
 * Part 1: Externalized authorization for GraphQL using the Cloudentity authorization platform
 * Part 2: Build a GraphQL server with Node.js and protect with the Cloudentity authorization platform
-* Part 3. Build a GraphQL client react application to consume GraphQL server resources protected with the Cloudentity authorization platform 
+* Part 3. Build a GraphQL client react application to consume GraphQL server resources protected with the Cloudentity authorization platform
 
 ![Graphql-client-operations](tweet-ui-components.jpeg)
 
-## Build a single page React app with with Nodejs 
+## Build a single page React app with with Nodejs
 
 We will be building the graphql server with nodejs express graphql and loki as a built in database for this
 demonstration. The goal of this article is to build a graphql server and have its endpoint protected.
@@ -60,7 +60,7 @@ As per this sample application, we will have
 * page that does not require authorization (/ page)
 * element that allows user to authorize (auth function within / page)
 * page that requires authorization (/usertweet)
-  ** if there is no user authorization, the user will be redirected to / page 
+  ** if there is no user authorization, the user will be redirected to / page
 
 So in our application routing, let's define the router and the auth redirects. We will use
 the Cloudentity AUth sdk to handle OAuth authorization (code => token exchange), redirects and
@@ -129,7 +129,7 @@ const httpLink = createHttpLink(
 
 const authLink = setContext( (_, {headers}) => {
   // get the authentication token from local storage if it exists
- 
+
  const accessTokenRaw = localStorage.getItem(authConfig.accessTokenName);
   //return the headers to the context so httpLink can read them
 
@@ -156,7 +156,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const client = new ApolloClient (
   {
-    link: from([authLink, errorLink, httpLink]), 
+    link: from([authLink, errorLink, httpLink]),
     cache: new InMemoryCache()
   }
 );
@@ -196,14 +196,14 @@ export function GetLatestTweets() {
         <h2> Latest Tweets</h2>
         <p> Our systems have detected that this request is NOT authorized to see the tweets... </p>
         <p> Reason for unauthorized: </p>
-        
+
     </div>
 );
   if (error) return (
       <div>
           <h2> Latest Tweets</h2>
           <p> System connection issues ... </p>
-          
+
       </div>
   );
 
@@ -222,16 +222,16 @@ export function GetLatestTweets() {
                   <div> {data.getLatestTweets[i].owner} @ {data.getLatestTweets[i].id}</div>
                   <div> tweeted - </div>
                 <div>Hi {i} {k} {data.getLatestTweets[i].content} </div>
-                
+
             </div>
           ))
         }
 
-       
+
       </div>
     );
   }
-  return <TweetsNotAvailable />;  
+  return <TweetsNotAvailable />;
 
 }
 ```
@@ -239,7 +239,7 @@ export function GetLatestTweets() {
 So now we have a homepage, that let's prompt the user to authorize to fetch an authorization token to call more
 resource server API's, as well as it makes a call to publicly exposed GraphQL api resource endpoint.
 
-#### Getting authorization token from Cloudentity 
+#### Getting authorization token from Cloudentity
 
 For this exercise, we will use an sdk provided by Cloudentity to perform an OAuth handshake with ACP
 and fetch an authorizationToken. More detaila about the sdk can be found here..
@@ -278,13 +278,13 @@ export const AuthButton = ({auth}) => {
     </div>
   );
 
-}  
+}
 ```
 
 `authConfig.ts`
 
 This file is the configuration of the remote Cloudentity authorization platform. As you can see, we have defined some OAuth `scopes`
-for this application and to 
+for this application and to
 
 ```js
 const authConfig = {
@@ -301,16 +301,18 @@ const authConfig = {
      letClientSetAccessToken: true,
      accessTokenName: 'ins_demo_access_token', // optional; defaults to '{tenantId}_{authorizationServerId}_access_token'
      idTokenName: 'ins_demo_id_token', // optional; defaults to '{tenantId}_{authorizationServerId}_id_token'
- 
+
  };
 
-export default authConfig; 
+export default authConfig;
 
 ```
 
 * Proxy to eliminate CORS error
 
-```js
+`package.json`
+
+```json
 {
 ..
   "proxy": "http://localhost:5001",
