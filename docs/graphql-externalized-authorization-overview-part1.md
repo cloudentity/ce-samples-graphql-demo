@@ -110,7 +110,7 @@ The Cloudentity authorization platform utilizes open standards and uses the OAut
 
 The Cloudentity authorization platform securely and automatically distributes the policy rule to all the runtime enforcement components, regularly referred as policy decision points. Cloudentity offers various enforcers in the form of sidecars, plugins, lambda etc. based on deployment platforms to enforce runtime access protection. Cloudentity enforcement points, also known as Micro Perimeter authorizers, are available for most of the widely adopted application deployment patterns and can be seamlessly plugged into deployment architectures to enforce authorization decisions.
 
-![Cloudentity istio microperimeter authorization](acp-workload-protect-overview.jpeg)
+![Cloudentity istio microperimeter authorization](authorizer-overview.jpeg)
 
 Some of the widely used authorizers that can be easily plugged into modern Cloud providers or for on prem workload protections are :
 * [Istio authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/)
