@@ -29,8 +29,8 @@ can be found here](https://github.com/cloudentity/ce-samples-graphql-demo/tree/m
 ---
 **SKIP/JUMP LEVEL**
 
-In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and `cd tweet-ui-graphql-react` and then go
-to [Run the application](#run-the-application)
+In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and `cd tweet-ui-graphql-react` and then go 
+to [Register the application](#register-the-application-in-cloudentity-authorization-platform)
 
 ---
 
@@ -292,10 +292,33 @@ export const AuthButton = ({auth}) => {
 }
 ```
 
-`authConfig.ts`
+* Proxy to eliminate CORS error
 
-This file contains the configuration required to handshake with the Cloudentity authorization platform to obtain an `accessToken`. For getting an accessToken, [follow this Cloudentity article to register a client
-application in Cloudentity authorization platform](https://docs.authorization.cloudentity.com/guides/developer/protect/application/) and populate the details in this configuration based on that.
+By default you will run into CORS error as the GraphQL APIs are served on a different host/port. To eliminate this we will use the React dev proxy to proxy all requests to GraphQL API server.
+
+`package.json`
+
+```json
+{
+  "proxy": "http://localhost:5001",
+}
+```
+
+### Register the application in Cloudentity authorization platform
+
+To consume any resources protect by Cloudentity authorization server, the consuming applications must first register themselves in the Cloudentity authorization
+platform. As a quick reminder we will be used open standard based OAuth flows for all this integrations.
+
+So get into the Cloudentity portal and register a single page client application.[Follow this Cloudentity article to register a client
+application in Cloudentity authorization platform](https://docs.authorization.cloudentity.com/guides/developer/protect/application/)
+
+Now that we have a registered client application, we will feed that into the configuration settings for the application we have been building.
+
+In `authConfig.ts`,
+
+This file contains the configuration required to handshake with Cloudentity authorization platform to obtain an accessToken to consume resources on behalf of
+an end user. The underlying Cloudentity SDK uses the authorization code grant with PKCE flow to get the accessToken and [more details about the PKCE flow can be read here](https://docs.authorization.cloudentity.com/features/oauth/grant_flows/auth_code_with_pkce/).
+
 
 ```js
 const authConfig = {
@@ -319,17 +342,7 @@ export default authConfig;
 
 ```
 
-* Proxy to eliminate CORS error
-
-By default you will run into CORS error as the GraphQL APIs are served on a different host/port. To eliminate this we will use the React dev proxy to proxy all requests to GraphQL API server.
-
-`package.json`
-
-```json
-{
-  "proxy": "http://localhost:5001",
-}
-```
+Now that we have everything configured and ready to go, let's run the application and test it out.
 
 ### Run the application
 
@@ -341,6 +354,12 @@ npm start
 http://localhost:3001
 ```
 
+### Exercise for the readers
+
+Now you can play around with various policies protecting the GraphQL API resources and see how the application handles various pieces and responds with etc.
+We hope this was an educational journey to clearly understand how the Cloudentity authorization solution can be used easily to solve the 
+complex authorization requirements within your organization. Feel free to contribute any modifications to the demo applications and concepts back to repo for 
+new readers to explore and understand. Happy learning!
 
 ### Conclusion
 
