@@ -2,20 +2,20 @@
 
 This article is part 2 of our GraphQL application protection series. In this article, we will build a GraphQL API
 server and protect its resources with externalized policies administered in Cloudentity Authorization SaaS platform.
-We will also protect the GraphQL API endpoint data with a local policy enforcement/decision point for the app deployed 
-within a local Kubernetes cluster. This approach also will showcase a 
+We will also protect the GraphQL API endpoint data with a local policy enforcement/decision point for the app deployed
+within a local Kubernetes cluster. This approach also will showcase a
 modern application protection hybrid model with local enforcement and Cloud based authorization and policy administration.
 
 * Part 1: Externalized authorization for GraphQL using the Cloudentity authorization platform
 * Part 2: Build a GraphQL server with Node.js and protect with the Cloudentity authorization platform
 * Part 3. Build a GraphQL client react application to consume GraphQL server resources protected with the Cloudentity authorization platform
 
-## Overview 
+## Overview
 
 We will build the graphQL API server with `express-graphql` and `lokijs` as a built in database.
-The sample business application is a tweet service that serves and consumes data as 
-per GraphQL specification. Once we build the application, we will deploy it to a local 
-kubernetes cluster using `kind` and enforce centralized and decoupled policy based authorization without 
+The sample business application is a tweet service that serves and consumes data as
+per GraphQL specification. Once we build the application, we will deploy it to a local
+kubernetes cluster using `kind` and enforce centralized and decoupled policy based authorization without
 modifying any business logic or code.
 
 Full source code can be found at: <>
@@ -50,7 +50,7 @@ Click enter with no input for all prompts during npm init and finally type `yes`
 
 ---
 
-### Add http routers and listeners 
+### Add http routers and listeners
 
 Create a file named `index.js` and add basic router and listeners. We will use the npm `express` module for easily adding route handling
 
@@ -115,7 +115,7 @@ Now that we have the basic structure in place, let's continue to add some GraphQ
 ### Add GraphQL capabilites to the nodejs server
 
 To add GraphQL specification to the node server, we will use the `express-graphql` npm package.
-Let's install the dependencies and attach a listener endpoint for graphQL. 
+Let's install the dependencies and attach a listener endpoint for graphQL.
 
 * **Install npm packages for graphQL support**
 
@@ -126,7 +126,7 @@ npm install --save graphql express-graphql
 * **Define a GraphQL schema**
 
 **GraphQL SDL** allows defintion of the graphQL schema using various constructs as
-defined in the [GraphQL specification](https://spec.graphql.org/June2018/#sec-Schema). Let's build a schema that has a mixed 
+defined in the [GraphQL specification](https://spec.graphql.org/June2018/#sec-Schema). Let's build a schema that has a mixed
 flavor of basic object types, fields, query and mutations. Add below block to `index.js`
 
 ```js
@@ -178,7 +178,7 @@ policies to each of these constructs.
 * **Add implementation & listener for a GraphQL query**
 
 Let's add a simple resolver implementation for the first query `sayHiTweety`. We will expand to other query and mutation implementations
-later in the article. In contrast to REST, GrpahQL is designed to be a single endpoint API system. So all the queries and mutations will 
+later in the article. In contrast to REST, GrpahQL is designed to be a single endpoint API system. So all the queries and mutations will
 be served over this single enpoint at `/graphql`. The url name can be anything, `graphql` is just used for convenience.
 
 ```js
@@ -220,15 +220,15 @@ is recommended.
 
 * **Execute GraphQL `sayHiTweety` query**
 
-Navigate to the [imported postman collection](https://www.getpostman.com/collections/b84dcc2e6d7034c02d48) under `request-noauth` folder and run the `sayHiTweety-Query` GraphQL API request. 
+Navigate to the [imported postman collection](https://www.getpostman.com/collections/b84dcc2e6d7034c02d48) under `request-noauth` folder and run the `sayHiTweety-Query` GraphQL API request.
 It should respond with the response attached below.
 
 ![Graphql-api-response](graphql-query-response.png)
 
-### Expand GraphQL implementation logic 
+### Expand GraphQL implementation logic
 
 Let's add a simple in-memory datastore to store the tweets and then add some mutations and queries to act on those objects.
-We are not going to dive into the specifics and add any complex business logic. Our main goal is to showcase **externalized 
+We are not going to dive into the specifics and add any complex business logic. Our main goal is to showcase **externalized
 authorization policy administration and enforcement** for the various **GraphQL objects, fields, queries and mutations etc at runtime**.
 
 * Install dependencies
@@ -302,7 +302,7 @@ var resolverRoot = {
 		tweets.findAndRemove({id: tid.id});
 		return tid.id;
 	},
-};	
+};
 
 ```
 
@@ -376,7 +376,7 @@ Once complete, you can see the cluster details using `kind get clusters`
 We will use helm to define and deploy all the Kubernetes resources required for the application. We will not be
 going into the helm details, [you can find all the helm templates already in the repo].
 
-Let's upload the image to kind cluster, create a Kubernetes namespace and deploy the GraphQL app. This all 
+Let's upload the image to kind cluster, create a Kubernetes namespace and deploy the GraphQL app. This all
 can be done running the `make` command below.
 
 `make deploy-app-graph-ns`
@@ -393,10 +393,10 @@ kubectl get services -n svc-apps-graph-ns
 
 ### Service readiness
 
-Let's exec into the pod container to see if the service is reachable
+Let's exec into the pod container to see if the service is reachable (note the ID appended to the name of the pod after running `kubectl get pods -n svc-apps-graph-ns` and replace it in the command below)
 
 ```
-kubectl exec -it svc-apps-graphql-tweet-service-graphql-nodejs-8457684f9f-lnqrd /bin/sh -n svc-apps-graph-ns
+kubectl exec -it svc-apps-graphql-tweet-service-graphql-nodejs-<-INSERT ID HERE-> /bin/sh -n svc-apps-graph-ns
 ```
 
 and run
@@ -477,12 +477,12 @@ Expected output.
 }
 ```
 
-Voila! Now the services should be accessible from outside the cluster. Now that we have a production like Kubernetes deployment serving GraphQL operations from the platform, let's dive into protecting the application using **externalized authorization policies using the Cloudentity platform** without altering the application code at all.
+Voila! Now the services should be accessible from outside the cluster. Now that we have a production-like Kubernetes deployment serving GraphQL operations from the platform, let's dive into protecting the application using **externalized authorization policies using the Cloudentity platform** without altering the application code at all.
 
 ## Authorization Policy administration in Cloudentity authorization platform
 
 * Sign up for a [free Cloudentity Authorization SaaS account](https://authz.cloudentity.io/register)
-* Set up a new workspace(aka OAuth authorization server) in the Cloudentity authorization Platform
+* Set up a new workspace (aka OAuth authorization server) in the Cloudentity authorization Platform
 
 ![Cloudentity istio microperimeter authorization](acp-istio-authorization.jpeg)
 
@@ -518,7 +518,7 @@ Make sure to check the service is still reachable.
 ### Download Istio authorizer microperimeter (Policy decision enforcer)
 
 Let's download the Cloudentity Istio authorizer microperimeter. This component will acts as the Policy Decision and Enforcement service in the local cluster. This component is also responsible
-to pull down all the applicable enforcement rules from the Cloudentity authorization platform. 
+to pull down all the applicable enforcement rules from the Cloudentity authorization platform.
 
 Higlighted in the box is the component that we will be downloading and installing onto a local Kuubernets cluster
 
@@ -543,26 +543,40 @@ Authorizer that will be deployed to its own name space (in this case `acp-system
 ![Cloudentity istio microperimeter authorization](istio-authorizer-namespaces.jpeg)
 
 
-Above `manifest` file from download package contains configuration to scan only the `default` namespace for services. In this case, the services are in a different namespace (i.e `svc-apps-graph-ns`) and hence we need to add the namespace onto the args to specific the namespace the `istio-authorizer` should scan to discover and protect the service, and then push that information back upto  Cloudentity authorization platform. Let's modify the downloaded `manifest.yaml` to include below args
+The `manifest` file from the download package contains configuration to scan only the `default` namespace for services. In this case, the services are in a different namespace (i.e `svc-apps-graph-ns`) and hence we need to add the namespace onto the args to specific the namespace the `istio-authorizer` should scan to discover and protect the service, and then push that information back up to the Cloudentity authorization platform. Let's modify the downloaded `manifest.yaml` to include the namespace args. Find the portion of the config block below, and insert the `args` param as shown below at the end of the snippet:
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
+metadata:
+  labels:
+    app: istio-authorizer
+  namespace: acp-system
+  name: istio-authorizer
 spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: istio-authorizer
   template:
+    metadata:
+      labels:
+        app: istio-authorizer
+      name: istio-authorizer
     spec:
       serviceAccountName: istio-authorizer
       containers:
-        - image: docker.cloudentity.io/istio-authorizer:2.0.0-2
+        - image: docker.cloudentity.io/istio-authorizer:2.0.0-8
           imagePullPolicy: IfNotPresent
           name: istio-authorizer
           args:
           - --namespace
           - svc-apps-graph-ns
+          env:
 ```
 
 Now we are ready to install the `istio-authorizer` resources using the Kubernetes kustomization file in the provided package. Make sure that you are running this command
-from the the downloaded folder location or whereever you may have moved it.
+from the the downloaded folder location or wherever you may have moved it.
 namespace
 
 ```
@@ -579,8 +593,8 @@ kubectl apply -f parse-body.yaml
 ```
 
 > NOTE
-> If you don't apply aboe request parser sidecar, you will get this error
-> 
+> If you don't apply the above request parser sidecar, you will get this error
+>
 > ```json
 > {
     "errors": [
@@ -606,13 +620,13 @@ Make sure the traffic path is allowed in case you see the pod status as not heal
 
 ---
 
-After this step we should see the API's pop up in the Cloudentity ACP SaaS platform. Let's check it out in the Cloudentity authorization platform.
+After this step we should see the APIs pop up in the Cloudentity ACP SaaS platform. Let's check it out in the Cloudentity authorization platform.
 
 * **Istio authorizer and Cloudentity ACP SaaS platform communication**
 
 It is very important that the communication path between the local Istio authorizer and Cloudentity ACP SaaS platform is established. The local istio authorizer is
-responsible for pushing any discovered services to platform for further governance. Once pushed the centralized policies administered and managed in the platform
-is polled back by the authorizer for policy decisioning and enforcement locally.
+responsible for pushing any discovered services to platform for further governance. Once pushed, the centralized policies administered and managed in the platform
+are polled back by the authorizer for policy decisions and enforcement locally.
 
 In the attached diagram, the `Last Active` column is an indication of communication status of the local authorizer with the remote platform
 
@@ -625,7 +639,7 @@ Regarding the communication security, the local Istio authorizer uses `OAuth` au
 Our next step is the process of binding the discovered services. Technically this means, we will register this discovered service as an `OAuth resource server` within
 the Cloudentity platform.
 
-Lets click on the services under `APIs` tab within the `Gateway` and click `Connect`. It will prompt to create a service(aka `OAuth resource server`). We can later attach scopes to service but for now we will just create a service and connect to it.
+Let's click on the services under `APIs` tab within the `Gateway` and click `Connect`. It will prompt to create a service (aka `OAuth resource server`). We can later attach scopes to service but for now we will just create a service and connect to it.
 
 ![Cloudentity istio microperimeter authorization](bind-the-service.png)
 
@@ -646,7 +660,7 @@ So now let's move back to the local authorizer to enforce traffic protection.
 
 ### Attach Cloudentity authorizer as Istio external authorization provider
 
-Cloudentity istio authorizer is designed to be an [Istio External authorizer](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/).
+Cloudentity Istio authorizer is designed to be an [Istio External authorizer](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/).
  Let's enable the Istio extension provider
 
 ![Cloudentity istio microperimeter authorization](istio-auth-extn.jpeg)
@@ -731,14 +745,14 @@ kubectl rollout restart deployment/istiod -n istio-system
 ### Enable Cloudentity external authorization
 
 Now that the external authorizer is defined and let's define the [external authorization policy](https://istio.io/latest/docs/concepts/security/#implicit-enablement).  
-External authorization policies are "CUSTOM" actions and will be evaluated first in the Istio authorization policy authorizer. 
+External authorization policies are "CUSTOM" actions and will be evaluated first in the Istio authorization policy authorizer.
 
 ```bash
 kubectl apply -f istio-configs/istio-mp-authorizer-policy.yaml
 ```
 
 At this point, all the platform components are installed and configured and we should
-be able to apply externalized authorization policies in Cloudentity authorization platform and 
+be able to apply externalized authorization policies in Cloudentity authorization platform and
 see at runtime the policy decision and enforcement being done by the `istio-authorizers` running in a local
 Kubernetes cluster.
 
@@ -753,23 +767,23 @@ kubectl rollout restart deployment/svc-apps-graphql-tweet-service-graphql-nodejs
 ## Enforce externalized dynamic authorization
 
 Before we start enforcing policies, let's run the postman to see if all the API operations are still
-accessible. Once that is done, let's try to add more authorization scenarios to enforce access and 
+accessible. Once that is done, let's try to add more authorization scenarios to enforce access and
 authorization policies authored and managed via the Cloudentity authorization platform.
 
-For policy governance, we expect the admin(policy administrator) to
+For policy governance, we expect the admin (policy administrator) to
 * Login into the Cloudentity Authorization portal
-* Navigate to the workspace and select APIs nav item to see the GraphQL API's
+* Navigate to the workspace and select APIs nav item to see the GraphQL APIs
 
 ### Scenario#1: Block GraphQL endpoint alltogether
 
-Let's say we want to temporarily block access to all user's for this endpoint. For this
+Let's say we want to temporarily block access to all users for this endpoint. For this
 * Select the GraphQL API endpoint and attach  a `Block API` policy.
 
 This in effect blocks any call made to any GraphQL operation. Run any of the test
-in the [imported Postman Test collection](https://www.getpostman.com/collections/b84dcc2e6d7034c02d48) 
+in the [imported Postman Test collection](https://www.getpostman.com/collections/b84dcc2e6d7034c02d48)
 and we should see a `403` response.
 
- 
+
 | Authorization policy | Output |
 | --- | ----------- |
 | ![alt-text-1](unprotected-graphql-endpoint.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
@@ -782,7 +796,7 @@ Let's say we do not want GraphQL clients to ask for specific field that is avail
  identifiers or only could be requested by some special priviliged internal applications.For this
 * Select the GraphQL API endpoint and enter into the `GraphQL API explorer`
 * Navigate to `Objects` and go to the `Tweet` field.
-* Assign the `Block API` policy to `dateModified` completely. 
+* Assign the `Block API` policy to `dateModified` completely.
 
 This in effect blocks any `GraphQL query` that requests for the `dateModified` field. Let's run the `getLatestTweets`
 query from the [imported Postman Test collection](https://www.getpostman.com/collections/b84dcc2e6d7034c02d48).
@@ -790,7 +804,7 @@ query from the [imported Postman Test collection](https://www.getpostman.com/col
 Modify the request payload to include/exclude `dateModified` in the query and observe the response difference.
 Whenever `dateModified` is requested, the request is automatically rejected.
 
- 
+
 | Authorization policy | Output |
 | --- | ----------- |
 | ![alt-text-1](date-modified-enforce.png "title-1") |  ![alt-text-2](api-field-date-modified-absent.png "title-2") |
@@ -798,7 +812,7 @@ Whenever `dateModified` is requested, the request is automatically rejected.
 
 
 
-### Scenario#3: Disallow GraphQL queries for specific objects with constraints 
+### Scenario#3: Disallow GraphQL queries for specific objects with constraints
 
 Let's say we do not want GraphQL clients to ask for specific object unless some specific constraints are met for that
 client application. For example, we want to return the `Tweet` object only when some `constraint` is met.
@@ -808,7 +822,7 @@ the policy.
 
 For this:
 * Select the GraphQL API endpoint and enter into the `GraphQL API explorer`
-* Navigate to `Objects` 
+* Navigate to `Objects`
 * Select the `Tweet` object and apply the constrained `IP check` policy at object level.
 
 `Sample Rego policy`
@@ -818,17 +832,17 @@ package acp.authz
 default allow = false
 
 allowedCidrRange :=   
-    [ 
+    [
     "3.0.0.0/9",
-    "3.128.0.0/10", 
-    "4.0.0.0/8", 
-    "5.8.63.0/32", 
-    "5.10.64.160/29", 
+    "3.128.0.0/10",
+    "4.0.0.0/8",
+    "5.8.63.0/32",
+    "5.10.64.160/29",
     "217.161.27.0/25"
     ]
-    
+
 extracted_ip := input.request.headers["X-Custom-User-IP"][_]   
-    
+
 is_within_allowed_cidr = true {
     some i
     net.cidr_contains(allowedCidrRange[i], extracted_ip)
@@ -839,7 +853,7 @@ allow {
 }
 
 ```
- 
+
 | Authorization policy | Output |
 | --- | ----------- |
 | ![alt-text-1](graphql-object-protect.png "title-1") |  ![alt-text-2](api-object-response.png "title-2") |
@@ -848,16 +862,16 @@ allow {
 ### Scenario#4: Block GraphQL delete mutation unless it comes from a client with specific metadata
 
 Let's say we do not want all GraphQL clients to operate on `deleteTweet` mutation.
-For example, we want to allow only accessToken's issued to specific clients to be authorized to use the
+For example, we want to allow only accessTokens issued to specific clients to be authorized to use the
 `deleteTweet` mutation. This way this operation can be used by specific clients and not all client apps even
 though it is available in schema.
 
 For this:
 * Select the GraphQL API endpoint and enter into the `GraphQL API explorer`
-* Navigate to `Mutation` 
+* Navigate to `Mutation`
 * Select the `deleteTweet` Mutation operation and apply the constrained `allow-only-for-specific-clients` policy at mutation level.
 
- 
+
 | Authorization policy | Output |
 | --- | ----------- |
 | ![alt-text-1](allow-specific-clients.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
@@ -866,11 +880,11 @@ For this:
 ### Scenario#5: Allow GraphQL query only if token is issued by a specific Authorization server
 
 Let's say we do not want all GraphQL clients to operate on `getTweets` query.
-For example, we want to allow only accessToken's issued by specific authorization servers to be authorized to use the
-`getTweets` query. 
+For example, we want to allow only accessTokens issued by specific authorization servers to be authorized to use the
+`getTweets` query.
 
 ![alt-text-1](issuer-check-policy.png)
- 
+
 | Authorization policy | Output |
 | --- | ----------- |
 | ![alt-text-1](graphql-query-enforce.png "title-1") |  ![alt-text-2](graphql-output-no-protection.png "title-2") |
@@ -880,6 +894,5 @@ For example, we want to allow only accessToken's issued by specific authorizatio
 
 Now that we have protected a GraphQL API resource server with dynamic and flexible authorization policies, we will build
 a simple GraphQL client application to demonstrate an entire application in real life. In this client application, we will
-look at how to get an accessToken from Cloudentity authorization server and then utilize it to make further calls
+look at how to get an accessToken from the Cloudentity authorization server and then utilize it to make further calls
 to GraphQL API resource server.
-
