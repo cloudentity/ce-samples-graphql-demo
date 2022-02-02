@@ -50,7 +50,6 @@ npm install --save @mui/material @emotion/react @emotion/styled @mui/icons-mater
 npm install --save @cloudentity/auth
 ```
 
-
 ### Define the react components
 
 #### Routing
@@ -231,7 +230,7 @@ export function GetLatestTweets() {
       </div>
     );
   }
-  return <TweetsNotAvailable />;  
+  return <TweetsNotAvailable />;
 
 }
 ```
@@ -310,7 +309,9 @@ export default authConfig;
 
 * Proxy to eliminate CORS error
 
-```js
+`package.json`
+
+```json
 {
 ..
   "proxy": "http://localhost:5001",

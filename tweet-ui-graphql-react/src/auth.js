@@ -1,10 +1,8 @@
 import {useState, useEffect} from 'react';
-//import {useSnackbar} from 'notistack';
 import authConfig from './authConfig.js';
 
 export const useAuth = (auth) => {
   const [authenticated, setAuthentication] = useState(null);
- // const {enqueueSnackbar} = useSnackbar();
 
   function removeQueryString() {
     if (window.location.href.split('?').length > 1) {

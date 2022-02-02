@@ -4,7 +4,7 @@ const authConfig = {
      // In situations where protocol may dynamically resolve to 'http' rather than 'https' (for example in dev mode), use 'baseUrl' rather than 'domain'.
      tenantId: 'rtest',
      authorizationServerId: 'ce-dev-playground-integrations',
-     clientId: 'c7e6u0eer3qh0m4pggig',
+     clientId: 'REPLACE_WITH_CLIENT_ID',
      redirectUri: 'http://localhost:3000/',
      silentAuthRedirectUri: 'window.location.href' + '/silent', // optional setting to redirect to a different endpoint following successful silent auth flow
      userInfoUri: 'https://rtest.authz.cloudentity.io/rtest/ce-dev-playground-integrations/userinfo', // optional, for fetching user info via API

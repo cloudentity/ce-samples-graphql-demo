@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "tweet-service-graphql-nodejs.labels" . | nindent 4 }}
   annotations:
-    services.k8s.cloudentity.com/spec-url: "https://pastebin.com/raw/zwJK5Kt4"
+    services.k8s.cloudentity.com/spec-url: "https://raw.githubusercontent.com/cloudentity/random-bin/master/graphql/tweet-svc-schema"
     services.k8s.cloudentity.com/graphql-path: "/graphql"
 spec:
   replicas: {{ .Values.replicaCount }}

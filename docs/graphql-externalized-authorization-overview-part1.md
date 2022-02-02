@@ -3,13 +3,13 @@
 This article is the first part of a series to explore usage of the Cloudentity authorization platform for externalized GraphQL runtime authorization along with policy based access controls for GraphQL native constructs. Modern applications require runtime and flexible authorization controls to manage the security and risk
 of data exposed using technologies like GraphQL to various consuming applications or users.
 
-* Part 1: Externalized authorization for GraphQL using the Cloudentity authorization platform
+* Part 1: Externalized authorization for GraphQL overview using the Cloudentity authorization platform
 * Part 2: Build a GraphQL server with Node.js and protect with the Cloudentity authorization platform
 * Part 3. Build a GraphQL client react application to consume GraphQL server resources protected with the Cloudentity authorization platform
 
 ## Power of GraphQL
 
-GraphQL is a query language for APIs and a runtime for fulfilling those queries with existing data objects. GraphQL uses a strong type system to define the capabilities of an API, and the object types exposed in the API are defined in a schema using the GraphQL Schema Definition Language (SDL). The schema is a contract between client and server defining how a client can access the data. And it also defines the data structure that is agreed to be sent/requested over the network, allowing rapid independent development by frontend and backend developers as producers and consumers. GraphQL gives enormous power to clients to request required data over single hops and reduce network latency to drive better user experience using rich and related data elements.    
+GraphQL is a query language for APIs and a runtime for fulfilling those queries with existing data objects. GraphQL uses a strong type system to define the capabilities of an API, and the object types exposed in the API are defined in a schema using the GraphQL Schema Definition Language (SDL). The schema is a contract between client and server defining how a client can access the data. And it also defines the data structure that is agreed to be sent/requested over the network, allowing rapid independent development by frontend and backend developers as producers and consumers. GraphQL gives enormous power to clients to request required data over single hops and reduce network latency to drive better user experience using rich and related data elements.
 
 ## Importance of data authorization
 
@@ -27,7 +27,7 @@ The Cloudentity authorization platform will enable
 * Application developers to decouple hard-to-audit local enforcement rules and move them to a centralized location
 * Application developers can manage, govern and enforce the externalized authorization rules independently of the application development
 * Application to transitively support advanced data authorization requirements, including RBAC (Role based access control), ABAC (Attribute based access control) style models, without any modification to application code
-* Applications to be readily complaint with emerging data standards like OpenBanking, OpenEnergy, OpenInsurance etc. in terms of data sharing and privacy controls
+* Applications to be readily compliant with emerging OpenData standards like OpenBanking, OpenEnergy, OpenInsurance etc. in terms of data sharing and privacy controls
 * Application security engineers to have more visibility to platforms that are requesting data and enforce conditional policies to restrict based on conditions
 * Applications to define and maintain all the authorization rules to be enforced as policies that will allow policy approval, review and other governance process
 * Application authorization policies to be defined in declarative format, which can be propagated across environments using modern CI/CD and devops pipelines
@@ -59,12 +59,12 @@ Cloudentity takes a declarative approach to authorization to allow externalized 
 
  ![Cloudentity graphQL API explorer](graphql-policy.jpeg)
 
-The authorization policy can be authored using data points that normally consist of:
+The authorization policy can be authored using data points obtained from:
 * Input HTTP request payload
 * HTTP request body
     * URL
     * Headers
-* Bearer token  
+* Bearer token
     * Key to identify the authorization context
 * Authentication context
     * Identity and authentication context associated to the Bearer token principal
@@ -106,14 +106,16 @@ The Cloudentity authorization platform utilizes open standards and uses the OAut
 
 The Cloudentity authorization platform securely and automatically distributes the policy rule to all the runtime enforcement components, regularly referred as policy decision points. Cloudentity offers various enforcers in the form of sidecars, plugins, lambda etc. based on deployment platform to enforce runtime access protection. Cloudentity enforcement points, also known as Micro Perimeter authorizers, are available for most of the widely adopted application deployment patterns and can be seamlessly plugged into deployment architectures to enforce authorization decisions.
 
-![Cloudentity istio microperimeter authorization](acp-istio-authorization.jpeg)
+![Cloudentity istio microperimeter authorization](acp-workload-protect-overview.jpeg)
 
-Some of the widely used authorizers are :
-* Istio authorizers for Kubernetes
-* Cloudentity authorizers for commonly used API gateways such as AWS API Gateway, Azure APIM , Google APIGEE X, APIGEE Edge, Kong etc.
-* Standalone authorizers for platform-independent containerized/non-containerized workloads
-* Lambda authorizers for supported Cloud platforms
-
+Some of the widely used authorizers that can be easily plugged into modern Cloud providers or for on prem workload protections are :
+* [Istio authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/)
+* [AWS API Gateway Authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/aws_api_gw/)
+* [Google Apigee Authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/apigee/)
+* [Azure API Gateway Authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/azure/)
+* [Kong authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/kong/)
+* [Pyron API Gateway authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/pyron/)
+* [Standalone authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/standalone/)
 
 ## GraphQL application protection demo
 

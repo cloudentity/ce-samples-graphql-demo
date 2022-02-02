@@ -20,7 +20,14 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 
 import {CastVote, GetVote} from './index.js';
 
-export function HomePageContent() {
+import {GetLatestTweets} from './tweetsFeed.js';
+import {PostTweet} from './postTweet.js';
+import Navbar from './navbar.js';
+import {Copyright} from './copyright.js';
+
+
+
+export function UserTweets() {
     const [open, setOpen] = React.useState(true);
 
     const toggleDrawer = () => {
@@ -29,6 +36,9 @@ export function HomePageContent() {
 
     return (
 <div>
+    <div className="App">
+      <Navbar />
+    </div>
         <Box
           component="main"
           sx={{
@@ -51,7 +61,7 @@ export function HomePageContent() {
                     height: 600,
                   }}
                 >
-                <CastVote />  
+                <PostTweet />  
                 </Paper>
               </Grid>
               {/* Recent Deposits */}
@@ -64,7 +74,7 @@ export function HomePageContent() {
                     height: 240,
                   }}
                 >
-                  <GetVote />
+                  <GetLatestTweets />
                 </Paper>
               </Grid>
               {/* Recent Orders */}
