@@ -13,7 +13,7 @@ GraphQL is a query language for APIs and a runtime for fulfilling those queries 
 
 ## Importance of data authorization
 
-As GraphQL is gaining traction in the developer community, it is very essential to focus on the data that is getting exposed in the contract via the API’s, along with the governance, authorization and visibility into data access by numerous consuming applications. Along with this it is also imperative that the authorization is externalized and centrally managed and flexible enough at runtime and should be moved from the core business logic itself. As an owner of the data that is being shared via GraphQL endpoints, such a system owner should be able to monitor all data requests and apply sufficient authorization controls over requested data in a flexible manner, mainly in this era of very fast evolving data sharing specifications across various jurisdictions.
+As GraphQL gains traction in the developer community, it becomes essential to focus on the data that is getting exposed in the contract via the API’s; along with the governance, authorization and visibility into data access by numerous consuming applications. It is also imperative that the authorization is externalized, centrally managed, and flexible enough at runtime to be moved away from the core business logic itself. Owners of the data that is being shared via GraphQL endpoints should be able to monitor all data requests and apply sufficient authorization controls over requested data in a flexible manner, especially in this era of very fast evolving data sharing specifications across various jurisdictions.
 
 ![Cloudentity externalized GraphQL authorization](cloudentity-graphql-overview.jpeg)
 
