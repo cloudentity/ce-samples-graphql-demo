@@ -10,13 +10,13 @@ and send the authorization token to underlying GraphQL services.
 
 ![Graphql-client-operations](tweet-ui-components.jpeg)
 
-## Build a single page React app with with Nodejs
+## Build a single page React app with with Nodejs (see article 2 in this series)
 
-We will be building the graphql server with nodejs express graphql and loki as a built in database for this
-demonstration. The goal of this article is to build a graphql server and have its endpoint protected.
+In the previous article, we built the GraphQL server with Node.js, `express`, `graphql` and `loki` as a built-in database for this
+demonstration. The goal was to build a GraphQL server and have its endpoint protected.
 
-We will be deploying this application to a native kubernetes cluster using `kind` and enforcing centralized
-and decoupled authorization without changing any business logic or code.
+We then deployed this application to a native Kubernetes cluster using `kind` and enforced centralized
+and decoupled authorization without changing any business logic or code. See the previous article for all the details.
 
 Full source code can be found at: <>
 
@@ -44,12 +44,11 @@ We will use following packages for this application
 * cloudentity/auth => cloudentity sdk to fetch and store OAuth accessTokens
 
 ```bash
-npm install react-router-dom
-npm install @apollo/client graphql
-npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
-npm install cloudentityauth
+npm install --save react-router-dom
+npm install --save @apollo/client graphql
+npm install --save @mui/material @emotion/react @emotion/styled @mui/icons-material
+npm install --save @cloudentity/auth
 ```
-
 
 ### Define the react components
 
@@ -63,10 +62,10 @@ As per this sample application, we will have
   ** if there is no user authorization, the user will be redirected to / page
 
 So in our application routing, let's define the router and the auth redirects. We will use
-the Cloudentity AUth sdk to handle OAuth authorization (code => token exchange), redirects and
-setting of accessToken. If an `accessToken` is not available in the local storage, user
-will be redirected to the page where user can see the `authorize` button and contents that
-does not require authorized tokens.
+the Cloudentity Auth sdk to handle OAuth authorization (code => token exchange), redirects and
+setting of the `accessToken`. If an `accessToken` is not available in the local storage, user
+will be redirected to the page where they can see the `authorize` button and contents that
+do not require authorized tokens.
 
 ```js
 function App() {
@@ -105,9 +104,9 @@ snippet for some explanation.
 
 #### Configure GraphQL API client
 
-We need to configure GraphQL API client to send in an authorization token(if available) in the local storage.
+We need to configure the GraphQL API client to send in an authorization token (if available) in the browser's local storage.
 If not, it will make GrpahQL API calls without this authorization token . More details and explanation
-about usage of apollo client can be fiund here https://www.apollographql.com/docs/react/why-apollo/
+about usage of apollo client can be found here https://www.apollographql.com/docs/react/why-apollo/
 
 ```js
 import {
@@ -333,10 +332,10 @@ Now that in previous article, we have an endpoint to call, let's see the whole a
 
 ### Conclusion
 
-This wraps up the tutorial for a sample GraphQL client server application protected using Cloudentity Authorization platform.
-In this series, you would have accomplished following things
+This wraps up the tutorial for a sample GraphQL client server application protected using the Cloudentity Authorization platform.
+In this series, you would have accomplished following things:
  * Develop a simple GraphQL service
  * Protect the GraphQL service API resources with Cloudentity ACP
  * Develop a simple GraphQL client application
- * Fetch authorization tokens from Cloudentity ACP and pass from client app to protected server resource
+ * Fetch authorization tokens from Cloudentity ACP and pass from the client app to the protected server resource
  * Dynamically change the protected server resource policy in ACP to control client app GraphQL API data access.

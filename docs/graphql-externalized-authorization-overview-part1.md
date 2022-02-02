@@ -59,7 +59,7 @@ Cloudentity takes a declarative approach to authorization to allow externalized 
 
  ![Cloudentity graphQL API explorer](graphql-policy.jpeg)
 
-The authorization policy can be authored using data points embedded or retrieved from or using:
+The authorization policy can be authored using data points obtained from:
 * Input HTTP request payload
 * HTTP request body
     * URL
@@ -94,7 +94,7 @@ Once a policy is authored using above data elements, it can be attached to any o
 
  Irrespective of the way the construct is attached, the annotated schema can be exported to allow fine grained policy administration pipelines within the team and across the environments which can include the following:
     * policy creation
-    * policy updation
+    * policy updating
     * Policy approval
     * policy evaluation
     * policy storage as code
@@ -117,7 +117,6 @@ Some of the widely used authorizers that can be easily plugged into modern Cloud
 * [Pyron API Gateway authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/pyron/)
 * [Standalone authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/standalone/)
 
-
 ## GraphQL application protection demo
 
 We will dive deeper in the next articles to go through some use cases to get an overview of the Cloudentity authorization concept applied to a GraphQL API subsystem.
@@ -132,4 +131,3 @@ Some of the authorization scenarios we will exploring in further articles are:
 * Enforce users having at least assurance level of NIST AAL 2 (Authenticator Assurance Level) to interact with particular GraphQL mutations
 * Enforce specific authorization for specific data fields
 * Enforce authorization for requests with specific types
-
