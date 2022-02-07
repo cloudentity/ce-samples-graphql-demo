@@ -18,7 +18,7 @@ per GraphQL specification. Once we build the application, we will deploy it to a
 kubernetes cluster using `kind` and enforce centralized and decoupled policy based authorization without
 modifying any business logic or code.
 
-![Cloudentity istio microperimeter authorization](acp-workload-protect-overview.jpeg)
+![Cloudentity istio authorizer authorization](acp-workload-protect-overview.jpeg)
 
 You can checkout this entire [demo application and related integration source here](https://github.com/cloudentity/ce-samples-graphql-demo)
 
@@ -477,9 +477,10 @@ Voila! Now the services should be accessible from outside the cluster. Now that 
 ## Authorization Policy administration in Cloudentity authorization platform
 
 * Sign up for a [free Cloudentity Authorization SaaS account](https://authz.cloudentity.io/register)
-* [Set up a new workspace(aka OAuth authorization server) in the Cloudentity authorization Platform](https://docs.authorization.cloudentity.com/guides/workspace_admin/workspace/add_workspaces/?q=workspace)
+** Activate the tenant
+** ... skip the tour... blah blah..
 
-![Cloudentity istio microperimeter authorization](authorizer-overview.jpeg)
+![Cloudentity istio authorizer](authorizer-overview.jpeg)
 
 ### Annotate services for service auto discovery
 
@@ -519,11 +520,11 @@ helm uninstall svc-apps-graphql -n svc-apps-graph-ns
 helm install svc-apps-graphql helm-chart/tweet-service-graphql-nodejs -n svc-apps-graph-ns
 ```
 
-### Download Istio authorizer microperimeter (Policy decision enforcer)
+### Download Cloudentity Istio authorizer (Policy decision authorizer)
 
-In this step, we will download and configure the Cloudentity Istio authorizer microperimeter. The scope of responsibility of this component is to act as the local policy decision point within the Kubernetes cluster. This component is also responsible to pull down all the applicable authorization policies authored and managed within the remote the Cloudentity authorization platform. In the below image, the highlighted section in the box is the component that we will be downloading and installing onto a local Kubernetes cluster.
+In this step, we will download and configure the Cloudentity Istio authorizer acting as athe policy decision point(PDP). The scope of responsibility of this component is to act as the local policy decision point within the Kubernetes cluster. This component is also responsible to pull down all the applicable authorization policies authored and managed within the remote the Cloudentity authorization platform. In the below image, the highlighted section in the box is the component that we will be downloading and installing onto a local Kubernetes cluster.
 
-![Cloudentity istio microperimeter authorization](mp-authorizer-highlight.jpeg)
+![Cloudentity istio authorizer](mp-authorizer-highlight.jpeg)
 
 [Detailed Istio setup concepts and instruction are available in this link,](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/) in a nutshell the steps are:
 * Navigate to Cloudentity authorization platform admin console
@@ -545,7 +546,7 @@ based on the deployment architecture. The namespaces chosen in this article are 
 
 ---
 
-![Cloudentity istio microperimeter authorization](k8s-component-namespaces.jpeg)
+![Cloudentity istio authorizer authorization](k8s-component-namespaces.jpeg)
 
 
 ---
@@ -600,7 +601,7 @@ kubectl apply -k .
 
 Above command will create a new `acp-system` namespace and deploy the `istio-authorizer` under that namespace. Watch for the pod status (`kubectl get pods -n acp-system`) to make sure the `istio-authorizer` comes up clean and healthy.
 
-Let's also add a request body parser sidecar for the service pod, without this the microperimeter authorizer will not be able to parse the GraphQL request body.
+Let's also add a request body parser sidecar for the service pod, without this the Cloudentity authorizer sidecar will not be able to parse the GraphQL request body.
 
 ---
 **IMPORTANT**
@@ -663,7 +664,7 @@ kubectl apply -f parse-body.yaml
 kubectl get pods -n acp-system
 ```
 
-![Cloudentity istio microperimeter authorization](healthy-istio-authorizer.png)
+![Cloudentity istio authorizer authorization](healthy-istio-authorizer.png)
 
 ---
 **IMPORTANT**
@@ -675,18 +676,18 @@ Make sure the traffic path is allowed in case you see the pod status as not heal
 
 After this step we should see the APIs auto discovered by the Cloudentity authorizer and propagated back up to the the Cloudentity Authorization SaaS platform. Let's check it out in the Cloudentity authorization platform.
 
-### **Microperimeter authorizer and Cloudentity platform communication**
+### **Cloudentity authorizer and Cloudentity platform communication**
 
 It is very important that the communication path between the local Istio authorizer and Cloudentity Authorization SaaS platform is established. The local istio authorizer is
 responsible for pushing any discovered services to platform for further governance. Once pushed, the centralized policies administered and managed in the platform
 are polled back by the authorizer for policy decisions and enforcement locally.
 
-![Cloudentity istio microperimeter authorization](mp-authorizer-highlight.jpeg)
+![Cloudentity istio authorizer authorization](mp-authorizer-highlight.jpeg)
 
 Login into the Cloudentity authorization admin portal and Navigate to the API's tab and click on Gateways. As shown in the below diagram, the `Last Active` column is an indication
 of communication status of the local authorizer with the remote platform
 
-![Cloudentity istio microperimeter authorization](succesful-istio-connection.png)
+![Cloudentity istio authorizer authorization](succesful-istio-connection.png)
 
 Regarding the communication security, the local Istio authorizer uses `OAuth` authorization mechanisms to authenticate itself to the Cloudentity authorization SaaS platform before handshaking information.
 
@@ -698,32 +699,32 @@ the Cloudentity platform. If you had checked the box to autobind services while 
 Let's click on the services under `APIs` tab within the `Gateway` and click `Connect`. It will prompt to create a service (aka `OAuth resource server`). We can later attach scopes
 to service but for now we will just create a service and connect to it.
 
-![Cloudentity istio microperimeter authorization](bind-the-service.png)
+![Cloudentity istio authorizer authorization](bind-the-service.png)
 
-![Cloudentity istio microperimeter authorization](create-resource-server.png)
+![Cloudentity istio authorizer authorization](create-resource-server.png)
 
 * **Explore GraphQL API and Schema**
 
-Now that the service is created within the Cloudentity authorization platform, we can govern the service endpoints. The discovered GraphQL schema transferred by the local Microperimeter authorizer is now visible in the platform for applying policies and managing the policies applied to the various constructs within that GraphQL schema.
+Now that the service is created within the Cloudentity authorization platform, we can govern the service endpoints. The discovered GraphQL schema transferred by the local Cloudentity authorizer is now visible in the platform for applying policies and managing the policies applied to the various constructs within that GraphQL schema.
 
-![Cloudentity istio microperimeter authorization](discovered-graphql-endpoint.png)
+![Cloudentity istio authorizer authorization](discovered-graphql-endpoint.png)
 
-![Cloudentity istio microperimeter authorization](graphql-schema-discovered.png)
+![Cloudentity istio authorizer authorization](graphql-schema-discovered.png)
 
 
 Now that we have seen the service is available in the Cloudentity authorization platform for governance and central management of authorization policies, which will automatically be
-downloaded by respective satelitte Microperimeter authorizers bound to the services. This way Cloudentity authorization platform acts as a very powerful and robust Policy Management Services engine and the Microperimeter authorizer acts as Policy runtime services that makes decisions using the policies governed and administered within the management engine.
+downloaded by respective local satelite Cloudentity authorizers bound to the services. This way Cloudentity authorization platform acts as a very powerful and robust Policy Management Services engine and the Cloudentity authorizers acts as Policy runtime services that makes decisions using the policies governed and administered within the central Policy management engine.
 
-Let's move back to the local Microperimeter authorizer to enforce traffic protection.
+Let's move back to the local Cloudentity authorizer to enforce traffic protection.
 
 
 ### Attach Cloudentity authorizer as Istio external authorization provider
 
 Cloudentity Istio authorizer is designed to be a native Istio extension that uses [Istio External authorizer](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/) model.
 
-Let's enable the Istio extension provider to accept Cloudentity Microperimeter Istio authorizer as an extension.
+Let's enable the Istio extension provider to accept Cloudentity Istio authorizer as an extension.
 
-![Cloudentity istio microperimeter authorization](istio-auth-extn.jpeg)
+![Cloudentity istio authorizer authorization](istio-auth-extn.jpeg)
 
 Edit the `istio config map` to define the external Cloudentity Istio authorizer.
 
@@ -812,7 +813,7 @@ kubectl apply -f istio-configs/istio-mp-authorizer-policy.yaml
 
 At this point, all the platform components are installed and configured and we should
 be able to apply externalized authorization policies in Cloudentity authorization platform and
-see the policy decision and enforcement at runtime being done by the `Cloudentity microperimeter isto authorizers`
+see the policy decision and enforcement at runtime being done by the `Cloudentity Istio authorizers`
  running in a local Kubernetes cluster.
 
 ### Restart the service pods
