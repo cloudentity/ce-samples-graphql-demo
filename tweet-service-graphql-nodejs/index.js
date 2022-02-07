@@ -20,7 +20,7 @@ var schema = buildSchema(
 		id: String
 		content: String
 		dateCreated: String
-    dateModified: String
+    	dateModified: String
 		author: String
 	}
 
@@ -83,13 +83,13 @@ var resolverRoot = {
 		return newTweet;
 	},
 	getLatestTweets: () => {
-		console.log("Fetching records..");
+		console.log("Fetching tweets..");
 		var tweets = db.getCollection('tweets');
 		var all = tweets.find({ 'id': { '$ne': null } });
 		return all;
 	},
 	deleteTweet: (tid) => {
-		console.log("Deleting tweet..");
+		console.log("Deleting a tweet");
 		var tweets = db.getCollection('tweets');
 		tweets.findAndRemove({id: tid.id});
 		return tid.id;

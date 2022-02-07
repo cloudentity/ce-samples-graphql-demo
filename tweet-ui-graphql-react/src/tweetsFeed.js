@@ -12,7 +12,8 @@ query {
     getLatestTweets {
         id,
         content,
-        author
+        author,
+        dateCreated
     }
   }
 `;
@@ -61,7 +62,7 @@ export function GetLatestTweets() {
   if (error) return (
       <div>
           <h2> Latest Tweets</h2>
-          <p> System connection issues ... </p>
+          <p> Unable to connect to GraphQL resource server ... </p>
           
       </div>
   );
@@ -78,16 +79,15 @@ export function GetLatestTweets() {
 
         {
           Object.keys(data.getLatestTweets).map((k,i) => (
-              <div>
-                  <div> {data.getLatestTweets[i].owner} @ {data.getLatestTweets[i].id}</div>
-                  <div> tweeted - </div>
-                <div>Hi {i} {k} {data.getLatestTweets[i].content} </div>
+              <ul>
+                  <div id={data.getLatestTweets[i].id}> 
+                  <u> {data.getLatestTweets[i].dateCreated} : </u>
+                  {data.getLatestTweets[i].author} tweeted <i> " {data.getLatestTweets[i].content}  "</i>
+                 </div>
                 
-            </div>
+            </ul>
           ))
         }
-
-       
       </div>
     );
   }
@@ -115,7 +115,6 @@ export function GetLatestTweetsForLoggedInUser() {
     );
   
     if(!latestTweetFetchStatus && data != null && data.getLatestTweets != null) {
-        console.log("updating fetch status to true since data is not null ##########")
       setFetchLatestTweetsStatus(true);
     }
   

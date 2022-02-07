@@ -37,7 +37,7 @@ Following tools are required to build this application. `nodejs` was picked for 
 > In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the
 > [github repo to get the application source code](https://github.com/cloudentity/ce-samples-graphql-demo)
 > ```bash
-> git@github.com:cloudentity/ce-samples-graphql-demo.git
+> git clone git@github.com:cloudentity/ce-samples-graphql-demo.git
 > ```
 > and follow instructions to continue with the [Build and Deploy Section](#deploy-and-run-graphql-api-workload-in-kubernetes-cluster)
 >

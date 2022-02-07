@@ -4,6 +4,7 @@ import {useEffect} from 'react';
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
+import jwt_decode from "jwt-decode";
 
 import { useMutation, gql } from '@apollo/client';
 
@@ -22,11 +23,8 @@ mutation PostTweetMutation(
 `;
 
 const tweetPostDefaultValues = {
-    name: "",
-    age: 0,
-    gender: "",
-    os: "",
-    favoriteNumber: 0,
+  content: "",
+  author: jwt_decode(window.localStorage.getItem("ins_demo_id_token")).sub
   };
 
 
@@ -65,31 +63,24 @@ const tweetPostDefaultValues = {
 
 export function PostTweet(props) {
 
-    const cloudentityAuthConfigForPost = new CloudentityAuth(authConfig);
+  //  const cloudentityAuthConfigForPost = new CloudentityAuth(authConfig);
   
     const  [formValues, setFormValues] = useState(tweetPostDefaultValues);
   
-    const handleSliderChange = (name) => (e, value) => {
-      setFormValues({
-        ...formValues,
-        [name]: value,
-      });
-    };
-
     //https://www.howtographql.com/react-apollo/3-mutations-creating-links/
 
-    const [postTweetMutation] = useMutation(CREATE_TWEET_MUTATION, {
+    const [postTweetMutation] =
+      useMutation(CREATE_TWEET_MUTATION, {
         variables: {
-            content: formValues.name,
-          author: formValues.gender
+          content: formValues.content,
+          author:  formValues.author
         }
-      });
+      })
 
     const handleSubmit = (event) => {
       event.preventDefault();
       postTweetMutation();
       window.location.reload(false);
-      console.log(formValues);
     };
   
   
@@ -107,19 +98,17 @@ export function PostTweet(props) {
         <form onSubmit= {handleSubmit} >
         <Grid container alignItems="center" justify="center" direction="column">
           <Grid item>
-              <p>Hi user, let's create a tweet.
+              <p>Hi {formValues.author}, let's create a tweet.
               </p>
           </Grid>
           <Grid item>
               
           </Grid>
           <Grid item>
-                        <TextField
-                placeholder="MultiLine with rows: 2 and rowsMax: 4"
-                multiline
-                rows={2}
-                maxRows={4}
-                />
+              <TextField name="content" placeholder="" multiline rows={2} onChange={handleInputChange}/>
+          </Grid>
+          <Grid item>
+             
           </Grid>
 
           <Grid item>

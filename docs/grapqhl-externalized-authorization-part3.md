@@ -29,8 +29,13 @@ can be found here](https://github.com/cloudentity/ce-samples-graphql-demo/tree/m
 ---
 **SKIP/JUMP LEVEL**
 
-In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) and `cd tweet-ui-graphql-react` and then go 
-to [Register the application](#register-the-application-in-cloudentity-authorization-platform)
+> In case you are not interested in building the application from scratch, you can skip some of the steps below and instead checkout/clone 
+>the [attached github repo](https://github.com/cloudentity/ce-samples-graphql-demo) 
+> > ```bash
+> git clone git@github.com:cloudentity/ce-samples-graphql-demo.git
+> cd tweet-ui-graphql-react
+> ```
+> and then jump to [Register the application](#register-the-application-in-cloudentity-authorization-platform)
 
 ---
 
