@@ -55,7 +55,7 @@ In REST, the shape and size of the resource is determined by the server, so a lo
 
 The Cloudentity authorization concept for GraphQL is tailored around the native constructs of GraphQL and allows authorization at multiple levels around the following building blocks:
 
-![Cloudentity native GraphQL support](graphql-constructs.png)
+![Cloudentity native GraphQL support](graphql-constructs.jpeg)
 
 ### Declarative authorization policies
 
@@ -110,7 +110,7 @@ The Cloudentity authorization platform utilizes open standards and uses the OAut
 
 The Cloudentity authorization platform securely and automatically distributes the policy rule to all the runtime enforcement components, regularly referred as policy decision points. Cloudentity offers various enforcers in the form of sidecars, plugins, lambda etc. based on deployment platforms to enforce runtime access protection. Cloudentity enforcement points, also known as Micro Perimeter authorizers, are available for most of the widely adopted application deployment patterns and can be seamlessly plugged into deployment architectures to enforce authorization decisions.
 
-![Cloudentity istio microperimeter authorization](authorizer-overview.jpeg)
+![Cloudentity authorizers overview](authorizer-concept-overview.jpeg)
 
 Some of the widely used authorizers that can be easily plugged into modern Cloud providers or for on prem workload protections are :
 * [Istio authorizer](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/)

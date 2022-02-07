@@ -24,8 +24,8 @@ mutation PostTweetMutation(
 
 const tweetPostDefaultValues = {
   content: "",
-  author: jwt_decode(window.localStorage.getItem("ins_demo_id_token")).sub
-  };
+  author: window.localStorage.getItem('ins_demo_id_token') ? jwt_decode(window.localStorage.getItem('ins_demo_id_token')).sub : 'anonymous'
+};
 
 
   export const usePostTweetAuthorization = (auth) => {
