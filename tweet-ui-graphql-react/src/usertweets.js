@@ -8,14 +8,16 @@ import Paper from '@mui/material/Paper';
 import {GetLatestTweets} from './tweetsFeed.js';
 import {PostTweet} from './postTweet.js';
 import {Copyright} from './copyright.js';
-import ButtonAppBar from './homePage.js';
+import Navbar from './navbar.js';
 
 export function UserTweets() {
     const [open, setOpen] = React.useState(true);
 
     return (
 <div>
-          <ButtonAppBar />
+<div className="App">
+      <Navbar />
+    </div>
           <Box component="main" sx={{ backgroundColor: '1', flexGrow: 1, height: '100vh', overflow: 'auto', }}> 
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
