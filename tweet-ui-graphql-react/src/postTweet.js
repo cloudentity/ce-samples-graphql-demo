@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import {useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
@@ -7,9 +6,6 @@ import TextField from "@mui/material/TextField";
 import jwt_decode from "jwt-decode";
 
 import { useMutation, gql } from '@apollo/client';
-
-import CloudentityAuth from '@cloudentity/auth';
-import authConfig from './authConfig.js';
 
 const CREATE_TWEET_MUTATION = gql`
 mutation PostTweetMutation(
@@ -22,21 +18,15 @@ mutation PostTweetMutation(
   }
 `;
 
-const tweetPostDefaultValues = {
-  content: "",
-  author: window.localStorage.getItem('ins_demo_id_token') ? jwt_decode(window.localStorage.getItem('ins_demo_id_token')).sub : 'anonymous'
-};
-
-
   export const usePostTweetAuthorization = (auth) => {
     const [accessTokenSet, setPostTweetAccessToken] = useState(null);
-  
+
     function removeQueryString() {
       if (window.location.href.split('?').length > 1) {
         window.history.replaceState({}, document.title, window.location.href.replace(/\?.*$/, ''));
       }
     }
-  
+
     useEffect(() => {
         auth.getAuth().then((res) => {
         if (res) {
@@ -57,16 +47,19 @@ const tweetPostDefaultValues = {
         }
       });
     });
-  
+
     return [accessTokenSet];
   };
 
-export function PostTweet(props) {
+export function PostTweet({auth}) {
 
-  //  const cloudentityAuthConfigForPost = new CloudentityAuth(authConfig);
-  
-    const  [formValues, setFormValues] = useState(tweetPostDefaultValues);
-  
+    const tweetPostDefaultValues = {
+      content: "",
+      author: window.localStorage.getItem('ins_demo_id_token') ? jwt_decode(window.localStorage.getItem('ins_demo_id_token')).sub : 'anonymous'
+    };
+
+    const [formValues, setFormValues] = useState(tweetPostDefaultValues);
+
     //https://www.howtographql.com/react-apollo/3-mutations-creating-links/
 
     const [postTweetMutation] =
@@ -82,8 +75,8 @@ export function PostTweet(props) {
       postTweetMutation();
       window.location.reload(false);
     };
-  
-  
+
+
     const  handleInputChange = (e) => {
       const { name, value } = e.target;
       setFormValues({
@@ -91,33 +84,34 @@ export function PostTweet(props) {
         [name]: value,
       });
     };
-  
+
+    useEffect(() => {}, [formValues]);
+
   return (
-  <div>
-        <h2>Post Tweet</h2>
-        <form onSubmit= {handleSubmit} >
+    <div>
+      <h2>Post Tweet</h2>
+      <form onSubmit= {handleSubmit} >
         <Grid container alignItems="center" justify="center" direction="column">
           <Grid item>
-              <p>Hi {formValues.author}, let's create a tweet.
-              </p>
+            <p>Hi {formValues.author}, let's create a tweet.</p>
           </Grid>
           <Grid item>
-              
+
           </Grid>
           <Grid item>
-              <TextField name="content" placeholder="" multiline rows={2} onChange={handleInputChange}/>
+            <TextField name="content" placeholder="" multiline rows={2} onChange={handleInputChange}/>
           </Grid>
           <Grid item>
-             
+
           </Grid>
 
           <Grid item>
-            <Button variant="contained" color="primary" type="submit">
+            <Button variant="contained" color="primary" type="submit" style={{marginTop: 10}}>
                 Post tweet
             </Button>
+          </Grid>
         </Grid>
-        </Grid>
-        </form>
-      </div>
+      </form>
+    </div>
   );
 }

@@ -11,7 +11,6 @@ import {Copyright} from './copyright.js';
 import Navbar from './navbar.js';
 
 export function UserTweets({auth}) {
-    const [open, setOpen] = React.useState(true);
 
     return (
 <div>
@@ -25,7 +24,7 @@ export function UserTweets({auth}) {
               {/* Chart */}
               <Grid item xs={6} md={4} lg={3}>
                 <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', height: 240,}}>
-                <PostTweet />
+                <PostTweet auth={auth} />
                 </Paper>
               </Grid>
               {/* Latest tweets */}

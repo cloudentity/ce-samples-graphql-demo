@@ -42,8 +42,14 @@ export function HomePageContent({auth}) {
                 {/* Auth Button */}
                 <Grid item xs={12} md={8} lg={4}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 500, }}>
-                  <AuthButton />
-                  </Paper>
+                  {auth === null ? (
+                    <div>
+                      Loading...
+                    </div>
+                  ) : (
+                    <AuthButton />
+                  )}
+                </Paper>
                 </Grid>
                 {/* Latest tweets */}
                 <Grid item xs={12} md={8} lg={6}>

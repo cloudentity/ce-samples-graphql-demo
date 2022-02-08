@@ -36,10 +36,10 @@ const Navbar = () => {
     function clearAuth() {
         cloudentity.revokeAuth()
           .then(() => {
-            navigate('/');
+            window.location.reload(false);
           })
           .catch(() => {
-            navigate('/');
+            window.location.reload(false);
           });
       }
 

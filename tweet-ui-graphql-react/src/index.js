@@ -6,9 +6,8 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate } from "react-router-dom";
-
-
+  Navigate
+} from "react-router-dom";
 
   import {
     ApolloClient,
@@ -20,14 +19,11 @@ import {
   import { setContext } from '@apollo/client/link/context';
   import { onError } from "@apollo/client/link/error";
 
-
-  import {UserTweets} from './usertweets.js';
-
+  import { HomePageContent } from './homePage.js';
+  import { UserTweets } from './usertweets.js';
   import CloudentityAuth from '@cloudentity/auth';
   import authConfig from './authConfig.js';
   import { useAuth } from './auth.js';
-
-  import {HomePageContent} from './homePage.js';
 
 
 const httpLink = createHttpLink(
@@ -74,16 +70,9 @@ const client = new ApolloClient (
   }
 );
 
-
-
-
 function App() {
-
-  //const navigate = useNavigate();
   const cloudentity = new CloudentityAuth(authConfig);
   const [authenticated] = useAuth(cloudentity);
-  const accessTokenRaw = localStorage.getItem(authConfig.accessTokenName);
-  const auth = authenticated && accessTokenRaw;
 
   return (
     <Router>
@@ -96,7 +85,6 @@ function App() {
       </div>
     </Router>
   );
-
 }
 
 render(

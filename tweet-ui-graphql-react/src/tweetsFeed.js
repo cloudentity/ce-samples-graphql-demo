@@ -32,15 +32,6 @@ query {
   }
 `;
 
-const FETCH_LATEST_TWEETS_FOR_LOGGED_IN_USER = gql `
-query {
-    getLoggedInUserTweets {
-        id,
-        content
-    }
-  }
-`;
-
 const DELETE_TWEET_MUTATION = gql`
 mutation DeleteTweetMutation(
     $id: String!
@@ -50,20 +41,16 @@ mutation DeleteTweetMutation(
 `;
 
 function isError403(e)  {
-   // console.log("Checkinf if the network error is a 403");
+   // Check if if the network error is a 403
     if(e.networkError != null) {
 
         switch(e.networkError.statusCode) {
             case 403:
                 return true;
-                break;
-
-             case 400:
+             default:
                  return false;
-                 break;
         }
     }
-
     return false;
 }
 
