@@ -117,7 +117,7 @@ To add GraphQL API compliant endpoint within the Node.js server application, we 
 Let's install the dependencies and attach a listener endpoint for graphQL.
 
 ```bash
-npm install --save graphql express-graphql
+npm install --save graphql@15.3.0 express-graphql@0.12.0
 ```
 
 **GraphQL SDL** allows defintion of the GraphQL schema using various constructs as
@@ -344,15 +344,24 @@ can be deployed using any tool of your choice, but we will use `kind` in this ar
 
 ### Build the docker image
 
-Let's build the docker image for GraphQL API using `make build-image`
+First get a copy of the `Makefile` and `Dockerfile`
+
+```bash
+wget https://raw.githubusercontent.com/cloudentity/ce-samples-graphql-demo/blob/master/tweet-service-graphql-nodejs/Makefile
+wget https://raw.githubusercontent.com/ce-samples-graphql-demo/blob/master/tweet-service-graphql-nodejs/Dockerfile
+```
+
+Now let's build the docker image for GraphQL API using 
+
+```bash
+make build-image
+```
 
 ### Launch the Kubernetes cluster
 
-We will create a Kubernetes cluster using `kind`. Below cluster config will be used to
+We will go ahead and create a Kubernetes cluster using `kind`. Below cluster config will be used to
 create the cluster and within the config, a `NodePort` is configured to enable accessibility
 at port `5001` from outside of the cluster since we do not have an actual load balancer.
-
-`k8s-cluster-config.yaml`
 
 ```yaml
 kind: Cluster
@@ -365,13 +374,21 @@ nodes:
     protocol: TCP
 ```
 
-Let's launch the kind cluster using below command:
+Get a copy of `k8s-cluster-config.yaml`
 
-`make deploy-cluster`
+```bash
+wget https://raw.githubusercontent.com/cloudentity/ce-samples-graphql-demo/master/tweet-service-graphql-nodejs/k8s-cluster-config.yaml
+```
+
+Create the kind cluster using:
+
+```bash
+make deploy-cluster
+```
 
 ### Deploy GraphQL app on the Kubernetes cluster
 
-We will use `helm` to define and deploy all the Kubernetes resources required for the application. We will not be going into the helm details, but [you can find all the helm templates already in the repo].
+We will use `helm` to define and deploy all the Kubernetes resources required for the application. We will not be going into the helm details, so copy the existing helm templates into our working directory from https://github.com/cloudentity/ce-samples-graphql-demo/tree/master/tweet-service-graphql-nodejs/helm-chart
 
 Using below `make` command, we will upload the image to kind cluster, create a Kubernetes namespace and deploy the GraphQL app.
 
@@ -383,6 +400,7 @@ Above make target will launch all the pods and services to run the GraphQL app. 
 
 ```bash
 kubectl get pods -n svc-apps-graph-ns
+
 kubectl get services -n svc-apps-graph-ns
 ```
 
@@ -391,7 +409,7 @@ kubectl get services -n svc-apps-graph-ns
 Let's exec into the pod container to see if the service is reachable (note the ID appended to the name of the pod after running `kubectl get pods -n svc-apps-graph-ns` and replace it in the command below)
 
 ```bash
-kubectl exec -it <pod-name> /bin/sh -n svc-apps-graph-ns
+kubectl exec -it <pod-name> -n svc-apps-graph-ns -- /bin/sh
 ```
 
 and run
@@ -425,11 +443,29 @@ We have condensed all required steps under the `make` target, which updates the 
 make deploy-istio
 ```
 
-Check the status of the pods using `kubectl get pods -n istio-system` and once the pod is healthy, let's add an Istio Ingress Gateway to expose the traffic outside the cluster
+Check the status of the pods: 
+
+```bash
+kubectl get pods -n istio-system
+```
+
+and once the pod is healthy, let's add an Istio Ingress Gateway to expose the traffic outside the cluster
 
 ### Expose the Service externally with Istio Ingress Gateway
 
-Let's install the `Istio Ingress Gateway` and configure a `Virtual Service` for routing to the GraphQL service in the `svc-apps-graph-ns` namespace using:
+Let's install the `Istio Ingress Gateway` and configure a `Virtual Service` for routing to the GraphQL service in the `svc-apps-graph-ns` namespace.
+Let's first copy some configs that will be used for below steps from the gitub repo:
+
+```bash
+mkdir istio-configs
+wget -P istio-configs https://raw.githubusercontent.com/cloudentity/ce-samples-graphql-demo/master/tweet-service-graphql-nodejs/istio-configs/istio-helm-config-override.yaml
+wget -P istio-configs https://raw.githubusercontent.com/cloudentity/ce-samples-graphql-demo/master/tweet-service-graphql-nodejs/istio-configs/istio-ingress-gateway-graphql.yaml
+wget -P istio-configs https://raw.githubusercontent.com/cloudentity/ce-samples-graphql-demo/master/tweet-service-graphql-nodejs/istio-configs/istio-ingress-virtual-service.yaml
+wget -P istio-configs https://raw.githubusercontent.com/cloudentity/ce-samples-graphql-demo/master/tweet-service-graphql-nodejs/istio-configs/istio-mp-authorizer-policy.yaml
+
+```
+
+ using:
 
 ```bash
 make deploy-istio-gateway
@@ -480,7 +516,7 @@ Voila! Now the services should be accessible from outside the cluster. Now that 
 * Activate the tenant and take the self guided tour to familiarize with the platform
 
 Now that you have Cloudentity platform available, let's connect all the pieces together
-as shown in this diagram
+as shown below
 
 ![Cloudentity istio authorizer](authorizer-concept-overview.jpeg)
 
@@ -521,23 +557,16 @@ helm uninstall svc-apps-graphql -n svc-apps-graph-ns
 helm install svc-apps-graphql helm-chart/tweet-service-graphql-nodejs -n svc-apps-graph-ns
 ```
 
-### Download Cloudentity Istio authorizer (Policy decision authorizer)
+### Deploy Cloudentity Istio authorizer to the Kubernetes cluster
 
-In this step, we will download and configure the Cloudentity Istio authorizer to act as the Policy Decision Point(PDP). The scope of responsibility of this component is to act as the local policy decision point within the Kubernetes cluster. This component is also responsible to pull down all the applicable authorization policies authored and managed within the remote the Cloudentity authorization platform. In the below image, the highlighted section in the box is the component that we will download and install onto a local Kubernetes cluster.
+In this step, we will install and configure the Cloudentity Istio authorizer to act as the Policy Decision Point(PDP). The scope of responsibility of this component is to act as the local policy decision point within the Kubernetes cluster. This component is also responsible to pull down all the applicable authorization policies authored and managed within the remote the Cloudentity authorization platform. In the below image, the highlighted section in the box is the component that we will download and install onto a local Kubernetes cluster.
 
 ![Cloudentity istio authorizer](mp-authorizer-highlight.jpeg)
 
 [Detailed Istio setup concepts and instruction are available here,](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/) in a nutshell the steps are:
 * Navigate to Cloudentity authorization platform admin console
 * Go to `Enforcement >> Authorizers` and Create a new Istio authorizer
-* Navigate to next tab and `Download package` to get all the required Kubernetes manifest files.
-
-### Deploy Istio authorizer to the Kubernetes cluster
-
-We will use the above downloaded package to deploy the Istio authorizer. Unzip the package and you will find various k8s resources that is required to deploy the Istio authorizer service onto the local Kubernetes cluster along with the communication secrets for the Cloudentity authorization platform.
-* `manifest.yaml`
-* `kustomization.yaml`
-* `parse-body.yaml`
+* Install the `istio-authorizer` in target Kubernetes using the Helm commands provided in installation instructions Step 1.
 
 ---
 **NOTE**
@@ -550,102 +579,36 @@ based on the deployment architecture. The namespaces chosen in this article are 
 ![Cloudentity istio authorizer authorization](k8s-component-namespaces.jpeg)
 
 
----
-**IMPORTANT**
-
-The `manifest` file from the download package contains configuration to scan only the `default` namespace for services. In this case, the services are in a different namespace (i.e `svc-apps-graph-ns`) and hence we need to add the namespace onto the args to specify the namespace the `istio-authorizer` should scan to discover and protect the service, and then push that information back up to the Cloudentity authorization platform. Let's modify the downloaded `manifest.yaml` to include the namespace args. Find the portion of the config block below, and insert the `args` param as shown below at the end of the snippet:
-
-Cloudentity Istio authorizer that will be deployed to its own name space (in this case `acp-system`)
-
----
-
-Let's modify the downloaded `manifest.yaml` to include `DISCOVERY_NAMESPACES` environment variable. Below provided block is just a snippet, so edit the downloaded file
-in place and add only the `DISCOVERY_NAMESPACES` argument to the list of `env` variables:
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: istio-authorizer
-  namespace: acp-system
-  name: istio-authorizer
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: istio-authorizer
-  template:
-    metadata:
-      labels:
-        app: istio-authorizer
-      name: istio-authorizer
-    spec:
-      serviceAccountName: istio-authorizer
-      containers:
-        - image: docker.cloudentity.io/istio-authorizer:2.0.0-9
-          imagePullPolicy: IfNotPresent
-          name: istio-authorizer
-          env:
-          - name: "DISCOVERY_NAMESPACES"
-            value: "svc-apps-graph-ns"
-...
-...
-```
-
-We are now ready to install the `istio-authorizer` resources using the Kubernetes kustomization file in the downloaded package. Make sure that you are running this command
-from the the downloaded folder location or wherever you may have moved it.
+Note that for our setup, we are going to install `istio-authorizer` in `acp-system` name space. So first let's create the namespace
 
 ```bash
-kubectl apply -k .
+kubectl apply -f istio-configs/istio-authorizer-helm-kustomize.yaml
+```
+
+Then run the command you see in the Cloudentity portal
+
+```
+helm repo add acp https://charts.cloudentity.io
+helm upgrade --install istio-authorizer acp/istio-authorizer \
+  --set clientCredentials.clientID=******************** \
+  --set clientCredentials.clientSecret=******************************************* \
+  --set issuerURL=https://rtest.us.authz.cloudentity.io/rtest/system
+```
+
+Update settings and run the override file, in this update we will configure:
+ ** namespaces to be discovered
+ ** add a request body parser sidecar for the service pod, without this the Cloudentity authorizer sidecar will not be able to parse the GraphQL request body.
+
+```bash
+helm upgrade istio-authorizer acp/istio-authorizer \
+   --values istio-configs/istio-authorizer-helm-value-overrides.yaml \
+   --namespace acp-system \
+   --timeout 5m \
+   --wait
 ```
 
 Above command will create a new `acp-system` namespace and deploy the `istio-authorizer` under that namespace. Watch for the pod status (`kubectl get pods -n acp-system`) to make sure the `istio-authorizer` comes up clean and healthy.
 
-Let's also add a request body parser sidecar for the service pod, without this the Cloudentity authorizer sidecar will not be able to parse the GraphQL request body.
-
----
-**IMPORTANT**
-
-Above `parse-body.yaml` file from download package contains configuration for the `default` namespace. In this case, the services are in a different namespace (i.e `svc-apps-graph-ns`) and hence we need to add the namespace onto the args to specific the namespace where this envoy filter sidecar needs to be attached
-
----
-
-```yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: EnvoyFilter
-metadata:
-  name: acp-authorizer-with-body
-  namespace: svc-apps-graph-ns
-spec:
-  configPatches:
-  - applyTo: HTTP_FILTER
-    match:
-      context: ANY
-      listener:
-        filterChain:
-          filter:
-            name: "envoy.filters.network.http_connection_manager"
-            subFilter:
-              name: "envoy.filters.http.ext_authz"
-    patch:
-      operation: MERGE
-      value:
-        name: envoy.filters.http.ext_authz
-        typed_config:
-          "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
-          with_request_body:
-            max_request_bytes: 8192
-            allow_partial_message: true
-            pack_as_bytes: true
-
-```
-
-Once it is updated, let's apply the k8s resource
-
-```bash
-kubectl apply -f parse-body.yaml
-```
 
 > NOTE
 > If you don't apply the above request parser sidecar, you will get this error
