@@ -67,7 +67,7 @@ function isError403(e)  {
     return false;
 }
 
-export function GetLatestTweets() {
+export function GetLatestTweets({auth}) {
   const {loading, error, data} = useQuery(FETCH_LATEST_TWEETS);
 
   const [latestTweetFetchStatus, setFetchLatestTweetsStatus] = useState(false);
@@ -175,16 +175,18 @@ export function GetLatestTweets() {
                   <u> {data.getLatestTweets[i].dateCreated} :</u>
                   <span> {data.getLatestTweets[i].author} tweeted <i> " {data.getLatestTweets[i].content} "</i></span>
                 </div>
-                <div style={{marginLeft: 10, marginTop: -12}}>
-                  <Stack direction="row" spacing={1}>
-                    <IconButton aria-label="edit" onClick={() => handleStartEdit(data.getLatestTweets[i].id, data.getLatestTweets[i].content)}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={() => handleDeleteTweet(data.getLatestTweets[i].id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Stack>
-                </div>
+                {auth && (
+                  <div style={{marginLeft: 10, marginTop: -12}}>
+                    <Stack direction="row" spacing={1}>
+                      <IconButton aria-label="edit" onClick={() => handleStartEdit(data.getLatestTweets[i].id, data.getLatestTweets[i].content)}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton aria-label="delete" onClick={() => handleDeleteTweet(data.getLatestTweets[i].id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Stack>
+                  </div>
+                )}
               </Fragment>
             )}
             </div>

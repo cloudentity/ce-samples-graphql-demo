@@ -10,7 +10,7 @@ import {PostTweet} from './postTweet.js';
 import {Copyright} from './copyright.js';
 import Navbar from './navbar.js';
 
-export function UserTweets() {
+export function UserTweets({auth}) {
     const [open, setOpen] = React.useState(true);
 
     return (
@@ -18,20 +18,20 @@ export function UserTweets() {
 <div className="App">
       <Navbar />
     </div>
-          <Box component="main" sx={{ backgroundColor: '1', flexGrow: 1, height: '100vh', overflow: 'auto', }}> 
+          <Box component="main" sx={{ backgroundColor: '1', flexGrow: 1, height: '100vh', overflow: 'auto', }}>
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
               {/* Chart */}
               <Grid item xs={6} md={4} lg={3}>
                 <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', height: 240,}}>
-                <PostTweet />  
+                <PostTweet />
                 </Paper>
               </Grid>
               {/* Latest tweets */}
               <Grid item xs={12} md={8} lg={9}>
               <Paper sx={{p: 2, display: 'flex', flexDirection: 'column', height: 600,}}>
-                  <GetLatestTweets />
+                  <GetLatestTweets auth={auth} />
                 </Paper>
               </Grid>
               <Grid item xs={12}>

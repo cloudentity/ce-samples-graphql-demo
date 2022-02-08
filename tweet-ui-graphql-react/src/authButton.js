@@ -34,9 +34,9 @@ export const AuthButton = ({auth}) => {
   return (
     <div className={classes.root} >
       <Stack className={classes.mainSection} direction="column" justifyContent="center" alignItems="center">
-        <p>If you want to see more than this, we need to identity and authorize you further.
+        <div style={{marginBottom: 15}}>If you want to see more than this, we need to identity and authorize you further.
         <h3>Let's get you in there!</h3>
-        </p>
+        </div>
         <Tooltip title="This will intiate OAuth authorization request with Cloudentity ACP" placement="top">
           <Button className="AuthenticateButton" variant="contained" onClick={() => buttonOnClick()}>Authorize</Button>
         </Tooltip>
@@ -45,4 +45,4 @@ export const AuthButton = ({auth}) => {
   );
 
 
-}  
+}

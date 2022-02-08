@@ -31,7 +31,7 @@ export default function ButtonAppBar() {
   );
 }
 
-export function HomePageContent() {
+export function HomePageContent({auth}) {
     return (
       <div>
           <ButtonAppBar />
@@ -42,13 +42,13 @@ export function HomePageContent() {
                 {/* Auth Button */}
                 <Grid item xs={12} md={8} lg={4}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 500, }}>
-                  <AuthButton />  
+                  <AuthButton />
                   </Paper>
                 </Grid>
                 {/* Latest tweets */}
                 <Grid item xs={12} md={8} lg={6}>
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 600, }}>
-                  <GetLatestTweets />
+                  <GetLatestTweets auth={auth} />
                   </Paper>
                 </Grid>
                 {/* Empty grid */}

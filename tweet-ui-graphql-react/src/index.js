@@ -69,7 +69,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const client = new ApolloClient (
   {
-    link: from([authLink, errorLink, httpLink]), 
+    link: from([authLink, errorLink, httpLink]),
     cache: new InMemoryCache()
   }
 );
@@ -89,11 +89,8 @@ function App() {
     <Router>
       <div>
         <Routes>
-          <Route path="/usertweet"  element={<UserTweets/>}>
-            
-          </Route>
-          <Route path="/usertweet1"  element={!auth ?<HomePageContent auth={auth} /> : <Navigate to='/usertweet' /> }></Route>
-          <Route path="/"  element={!auth ? <HomePageContent auth={auth} /> : <Navigate to='/usertweet' /> }>
+          <Route path="/usertweet"  element={!authenticated ? <Navigate to='/' /> : <UserTweets auth={authenticated}/> }></Route>
+          <Route path="/"  element={!authenticated ? <HomePageContent auth={authenticated} /> : <Navigate to='/usertweet' /> }>
           </Route>
         </Routes>
       </div>
