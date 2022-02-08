@@ -18,7 +18,7 @@ per GraphQL specification. Once we build the application, we will deploy it to a
 kubernetes cluster using `kind` and enforce centralized and decoupled policy based authorization without
 modifying any business logic or code.
 
-![Cloudentity istio authorizer authorization](acp-workload-protect-overview.jpeg)
+![Cloudentity authorization](acp-workload-protect-overview.jpeg)
 
 You can checkout this entire [demo application and related integration source here](https://github.com/cloudentity/ce-samples-graphql-demo)
 
@@ -477,24 +477,25 @@ Voila! Now the services should be accessible from outside the cluster. Now that 
 ## Authorization Policy administration in Cloudentity authorization platform
 
 * Sign up for a [free Cloudentity Authorization SaaS account](https://authz.cloudentity.io/register)
-** Activate the tenant
-** ... skip the tour... blah blah..
+* Activate the tenant and take the self guided tour to familiarize with the platform
 
-![Cloudentity istio authorizer](authorizer-overview.jpeg)
+Now that you have Cloudentity platform available, let's connect all the pieces together
+as shown in this diagram
+
+![Cloudentity istio authorizer](authorizer-concept-overview.jpeg)
 
 ### Annotate services for service auto discovery
 
-Cloudentity micropermeter authorizers can self discover API endpoints if annotated properly in a Kubernetes cluster. More details on discovery is detailed in the linked article [auto discovery of services on Istio](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/graphql/#graphql-api-discovery).
+Cloudentity micropermeter authorizers can self discover API endpoints if annotated properly in a Kubernetes cluster. More details on discovery is detailed in [auto discovery of services on Istio](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/graphql/#graphql-api-discovery).
 
-For example, [in the helm chart](https://github.com/cloudentity/ce-samples-graphql-demo/blob/master/tweet-service-graphql-nodejs/helm-chart/tweet-service-graphql-nodejs/templates/deployment.yaml#L8), we have annotated the services so that final Deployment resource file has the annotations.
-So the GraphQL schema file for the service is being read from below location. This annotation enables this GraphQL schema to be read by
+For example, [in the helm chart](https://github.com/cloudentity/ce-samples-graphql-demo/blob/master/tweet-service-graphql-nodejs/helm-chart/tweet-service-graphql-nodejs/templates/deployment.yaml#L8), we have annotated the services so that final Deployment resource file has the annotations. `services.k8s.cloudentity.com/spec-url` annotation enables this GraphQL schema to be read by
 Cloudentity Istio authorizers deployed onto a cluster and then propagated to Cloudentity Authorization Plaform which can then govern and
-attach policies can be declaratively attached to the GraphQL schema.
+attach declarative policies on the GraphQL schema itself.
 
 ---
 **NOTE**
 
-The schema URL can be served by the GraphQL API resource server itself or hosted in separate accessible location, we are using
+The GraphQL schema URL can be served by the GraphQL API resource server itself or hosted in separate accessible location, we are using
 an external url only for demonstration purpose
 
 ---
@@ -522,14 +523,14 @@ helm install svc-apps-graphql helm-chart/tweet-service-graphql-nodejs -n svc-app
 
 ### Download Cloudentity Istio authorizer (Policy decision authorizer)
 
-In this step, we will download and configure the Cloudentity Istio authorizer acting as athe policy decision point(PDP). The scope of responsibility of this component is to act as the local policy decision point within the Kubernetes cluster. This component is also responsible to pull down all the applicable authorization policies authored and managed within the remote the Cloudentity authorization platform. In the below image, the highlighted section in the box is the component that we will be downloading and installing onto a local Kubernetes cluster.
+In this step, we will download and configure the Cloudentity Istio authorizer to act as the Policy Decision Point(PDP). The scope of responsibility of this component is to act as the local policy decision point within the Kubernetes cluster. This component is also responsible to pull down all the applicable authorization policies authored and managed within the remote the Cloudentity authorization platform. In the below image, the highlighted section in the box is the component that we will download and install onto a local Kubernetes cluster.
 
 ![Cloudentity istio authorizer](mp-authorizer-highlight.jpeg)
 
-[Detailed Istio setup concepts and instruction are available in this link,](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/) in a nutshell the steps are:
+[Detailed Istio setup concepts and instruction are available here,](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/) in a nutshell the steps are:
 * Navigate to Cloudentity authorization platform admin console
-* Go to `APIs >> Gateways` and register a new Istio authorizer
-* Navigate to next tab and `Download package` to get all the required Kubernetes resource files.
+* Go to `Enforcement >> Authorizers` and Create a new Istio authorizer
+* Navigate to next tab and `Download package` to get all the required Kubernetes manifest files.
 
 ### Deploy Istio authorizer to the Kubernetes cluster
 
@@ -684,8 +685,7 @@ are polled back by the authorizer for policy decisions and enforcement locally.
 
 ![Cloudentity istio authorizer authorization](mp-authorizer-highlight.jpeg)
 
-Login into the Cloudentity authorization admin portal and Navigate to the API's tab and click on Gateways. As shown in the below diagram, the `Last Active` column is an indication
-of communication status of the local authorizer with the remote platform
+Login into the Cloudentity authorization admin portal and Navigate to the `Enforcement >> Authorizers`. As shown in the below diagram, the `Last Active` column is an indication of communication status of the local authorizer with the remote platform
 
 ![Cloudentity istio authorizer authorization](succesful-istio-connection.png)
 
@@ -696,8 +696,7 @@ Regarding the communication security, the local Istio authorizer uses `OAuth` au
 Our next step is the process of binding the discovered services. Technically this means, we will register this discovered service as an `OAuth resource server` within
 the Cloudentity platform. If you had checked the box to autobind services while registering the Gateway, you can skip this step.
 
-Let's click on the services under `APIs` tab within the `Gateway` and click `Connect`. It will prompt to create a service (aka `OAuth resource server`). We can later attach scopes
-to service but for now we will just create a service and connect to it.
+Let's click on the services under `APIs` tab within the `Gateway` and click `Connect`. It will prompt to create a service (aka `OAuth resource server`). We can later attach scopes to service but for now we will just create a service and connect to it.
 
 ![Cloudentity istio authorizer authorization](bind-the-service.png)
 
@@ -826,13 +825,13 @@ kubectl rollout restart deployment/svc-apps-graphql-tweet-service-graphql-nodejs
 
 ## Enforce externalized dynamic authorization
 
-Before we start enforcing policies, run the postman collection((https://www.getpostman.com/collections/b84dcc2e6d7034c02d48))
+Before we start enforcing policies, run the postman collection(https://www.getpostman.com/collections/b84dcc2e6d7034c02d48)
 to check if all the GraphQL API operations are still accessible. Once the pre check is complete, let's try to add more authorization scenarios to enforce access and
 authorization policies authored and managed via the Cloudentity authorization platform.
 
 For policy governance, we expect the admin (policy administrator) to
 * Login into the Cloudentity Authorization portal
-* Navigate to the workspace and select APIs nav item to see the GraphQL APIs
+* Navigate to the workspace and select `Enforcement >> APIs` nav item to see the GraphQL APIs
 * Apply policies at various GraphQL construct level in the GraphQL API explorer
 
 ### Scenario#1: Block GraphQL endpoint alltogether
