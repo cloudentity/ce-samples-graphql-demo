@@ -1,7 +1,7 @@
 # Build a GraphQL client application to consume protected GraphQL API resources
 
 This article is part 3 of our GraphQL application protection series. In this article, we will build a GraphQL client
-that is capable of invoking GraphQL API calls, obtain authorized accessTokens from a Cloudentity authorization server
+that is capable of invoking GraphQL API calls, obtain authorized access tokens from a Cloudentity authorization server
 and send the authorization token to underlying GraphQL services.
 
 * Part 1: Externalized authorization for GraphQL using the Cloudentity authorization platform
@@ -80,7 +80,7 @@ As per this sample application, we will have
 
 So in our application routing, let's define the router and the auth redirects. We will use
 the Cloudentity Auth sdk to handle OAuth authorization (code => token exchange), redirects and
-setting of the `accessToken`. If an `accessToken` is not available in the local storage, user
+setting of the `accessToken`. If an `accessToken` is not available in the local storage, the user
 will be redirected to the page where they can see the `authorize` button and contents that
 do not require authorized tokens.
 
@@ -118,13 +118,13 @@ snippet for some explanation.
 #### Homepage
 
 `homepage.js` contains mainly two main elements of interest other than navigation and style elements
- * `authorize` button   => Calls to Cloudentity authorization platform to authorize the user
+ * `authorize` button   => Calls to the Cloudentity authorization platform to authorize the user
  * `Latest tweets` element => Unprotected GraphQL API call
 
 #### Configure GraphQL API client
 
 We need to configure the GraphQL API client to send in an authorization token (if available) retrieved from the browser's local storage.
-If not, it will make GrpahQL API calls without this authorization token . [More details and explanation
+If not, it will make GraphQL API calls without this authorization token . [More details and explanation
 about usage of apollo client can be found here](https://www.apollographql.com/docs/react/why-apollo/)
 
 ```js
@@ -183,7 +183,7 @@ const client = new ApolloClient (
 
 ### Invoking GraphQL APIs
 
-For invoking GraphQL APIs we will utilize the Apollo client configured above
+For invoking GraphQL APIs, we will utilize the Apollo client configured above
 
 ```js
 
@@ -254,12 +254,12 @@ export function GetLatestTweets() {
 }
 ```
 
-So now we have a homepage that prompts the user to authorize, resulting in an authorization token to call more
+Now we have a homepage that prompts the user to authorize, resulting in an authorization token to call more
 resource server APIs, as well as making a call to a publicly exposed GraphQL API resource endpoint.
 
 #### Getting an authorization token from Cloudentity
 
-We will use the [Cloudentity OAuth JS SDK](https://github.com/cloudentity/cloudentity-auth-js) to perform an OAuth handshake with Cloudentity authorization platform and fetch an authorizationToken.
+We will use the [Cloudentity OAuth JS SDK](https://github.com/cloudentity/cloudentity-auth-js) to perform an OAuth handshake with the Cloudentity authorization platform and fetch an authorization token.
 
 `authButton.js`
 
@@ -300,7 +300,7 @@ export const AuthButton = ({auth}) => {
 
 * Proxy to eliminate CORS error
 
-By default you will run into CORS error as the GraphQL APIs are served on a different host/port. To eliminate this we will use the React dev proxy to proxy all requests to GraphQL API server.
+By default you will run into CORS error as the GraphQL APIs are served on a different host/port. To eliminate this, we will use the react dev proxy to proxy all requests to the GraphQL API server.
 
 `package.json`
 
@@ -312,18 +312,18 @@ By default you will run into CORS error as the GraphQL APIs are served on a diff
 
 ### Register the application in Cloudentity authorization platform
 
-To consume any resources protect by Cloudentity authorization server, the consuming applications must first register themselves in the Cloudentity authorization
-platform. As a quick reminder we will be used open standard based OAuth flows for all this integrations.
+To consume any resources protected by the Cloudentity authorization server, the consuming applications must first register themselves in the Cloudentity authorization
+platform. As a quick reminder, we will be using open standard based OAuth flows for all these integrations.
 
 So get into the Cloudentity portal and register a single page client application.[Follow this Cloudentity article to register a client
-application in Cloudentity authorization platform](https://docs.authorization.cloudentity.com/guides/developer/protect/application/)
+application in the Cloudentity authorization platform](https://docs.authorization.cloudentity.com/guides/developer/protect/application/)
 
 Now that we have a registered client application, we will feed that into the configuration settings for the application we have been building.
 
 In `authConfig.ts`,
 
-This file contains the configuration required to handshake with Cloudentity authorization platform to obtain an accessToken to consume resources on behalf of
-an end user. The underlying Cloudentity SDK uses the authorization code grant with PKCE flow to get the accessToken. [Read more about the OAuth PKCE flow](https://docs.authorization.cloudentity.com/features/oauth/grant_flows/auth_code_with_pkce/).
+This file contains the configuration required to handshake with the Cloudentity authorization platform to obtain an access token to consume resources on behalf of
+an end user. The underlying Cloudentity SDK uses the authorization code grant with PKCE flow to get the access token. [Read more about the OAuth PKCE flow](https://docs.authorization.cloudentity.com/features/oauth/grant_flows/auth_code_with_pkce/).
 
 
 ```js
@@ -367,7 +367,7 @@ access can be dynamically controlled.
 
 ### Exercise for the readers
 
-Now you can play around with various policies protecting the GraphQL API resources and see how the application handles various pieces and responds with etc.
+Now you can play around with various policies protecting the GraphQL API resources and see how the application handles various pieces and responds.
 We hope this was an educational journey to clearly understand how the Cloudentity authorization solution can be used easily to solve the 
 complex authorization requirements within your organization. Feel free to contribute any modifications to the demo applications and concepts back to repo for 
 new readers to explore and understand. Happy learning!
@@ -375,9 +375,9 @@ new readers to explore and understand. Happy learning!
 ### Conclusion
 
 This wraps up the tutorial for a sample GraphQL client server application protected using the Cloudentity Authorization platform.
-In this series, you would have accomplished following things:
+In this series, you will have accomplished the following things:
  * Develop a simple GraphQL service
- * Protect the GraphQL service API resources with Cloudentity Authorization Platform
+ * Protect the GraphQL service API resources with the Cloudentity Authorization Platform
  * Develop a simple GraphQL client application
- * Fetch authorization tokens from Cloudentity Authorization Platform and pass from the client app to the protected server resource
- * Dynamically change the protected server resource policy in ACP to control client app GraphQL API data access.
+ * Fetch authorization tokens from the Cloudentity Authorization Platform and pass from the client app to the protected server resource
+ * Dynamically change the protected server resource policy in ACP to control client app GraphQL API data access
