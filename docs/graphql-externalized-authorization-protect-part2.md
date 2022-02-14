@@ -565,49 +565,39 @@ In this step, we will install and configure the Cloudentity Istio authorizer to 
 
 [Detailed Istio setup concepts and instruction are available here,](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/) in a nutshell the steps are:
 * Navigate to the Cloudentity authorization platform admin console
-* Go to `Enforcement >> Authorizers` and Create a new Istio authorizer
-* Install the `istio-authorizer` in target Kubernetes using the Helm commands provided in installation instructions Step 1.
+* Go to `Enforcement >> Authorizers` and Create a new Istio authorizer. Click on "Bind services automatically". Technically, this means we will register this discovered service as an `OAuth resource server` within
+the Cloudentity platform. 
+* Install the `istio-authorizer` in target Kubernetes using the `Helm` commands provided in installation instructions Step 1.
 
 ---
 **NOTE**
 
-Cloudentity Istio authorizer will be deployed to its own name space (in this case `acp-system`). The authorizers can be deployed to any namespace
+Cloudentity Istio authorizer will be deployed to its own name space (in this case `acp-istio-authorizer`). The authorizers can be deployed to any namespace
 based on the deployment architecture. The namespaces chosen in this article are for demonstration purpose only.
 
 ---
 
+What happens with the given helm command?
+* The above command will create a new `acp-istio-authorizer` namespace
+* deploy the `istio-authorizer` under that namespace
+* Configures the target namespaces the authorizer should scan for service discovery and traffic enforcement
+* Creates a [request body parser Envoy filter resource](https://github.com/cloudentity/acp-helm-charts/blob/master/charts/istio-authorizer/templates/envoyfilter.yaml) for the service pod in the target namespaces (if configured)
+* Creates the [Cloudentity authorization policy resource](https://github.com/cloudentity/acp-helm-charts/blob/master/charts/istio-authorizer/templates/policy.yaml)  as an [Istio external authorization policy](https://istio.io/latest/docs/concepts/security/#implicit-enablement).  External authorization policies are "CUSTOM" actions and will be evaluated first in the Istio authorization policy authorizer.
+
 ![Cloudentity istio authorizer authorization](k8s-component-namespaces.jpeg)
 
-
-Note that for our setup, we are going to install `istio-authorizer` in `acp-system` name space. So first let's create the namespace
-
-```bash
-kubectl apply -f istio-configs/istio-authorizer-helm-kustomize.yaml
+You can modify the command to include an override in the values file
+```
+parseBody:
+  enabled: true
 ```
 
-Then run the command you see in the Cloudentity portal
-
 ```
-helm repo add acp https://charts.cloudentity.io
 helm upgrade --install istio-authorizer acp/istio-authorizer \
-  --set clientCredentials.clientID=******************** \
-  --set clientCredentials.clientSecret=******************************************* \
-  --set issuerURL=https://rtest.us.authz.cloudentity.io/rtest/system
+  -f overide-values.yaml
+  ..
+  ..
 ```
-
-Update settings and run the override file. In this update we will configure:
- ** namespaces to be discovered
- ** add a request body parser sidecar for the service pod. Without this the Cloudentity authorizer sidecar will not be able to parse the GraphQL request body.
-
-```bash
-helm upgrade istio-authorizer acp/istio-authorizer \
-   --values istio-configs/istio-authorizer-helm-value-overrides.yaml \
-   --namespace acp-system \
-   --timeout 5m \
-   --wait
-```
-
-The above command will create a new `acp-system` namespace and deploy the `istio-authorizer` under that namespace. Watch for the pod status (`kubectl get pods -n acp-system`) to make sure the `istio-authorizer` comes up clean and healthy.
 
 
 > NOTE
@@ -623,9 +613,13 @@ The above command will create a new `acp-system` namespace and deploy the `istio
 }
 >```
 
+Step 2 , attach external authorization to Istio
+
+Cloudentity Istio authorizer is designed to be a native Istio extension that uses [Istio External authorizer](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/) model.Add `extensionProviders` under `mesh` section to indicate that `acp-authorizer` will be an external authz provider.
+
 
 ```bash
-kubectl get pods -n acp-system
+kubectl get pods -n acp-istio-authorizer
 ```
 
 ![Cloudentity istio authorizer authorization](healthy-istio-authorizer.png)
@@ -638,7 +632,16 @@ Make sure the traffic path is allowed in case you see the pod status as not heal
 
 ---
 
+#### Restart the service pods
+
+Since we are using automatic Istio injection, we need to recreate the pod so that `envoy-proxy` is injected into the service namespaces
+
+```
+kubectl rollout restart deployment/svc-apps-graphql-tweet-service-graphql-nodejs -n svc-apps-graph-ns
+```
+
 After this step we should see the APIs auto discovered by the Cloudentity authorizer and propagated back up to the the Cloudentity Authorization SaaS platform. Let's check it out in the Cloudentity authorization platform.
+
 
 ### **Cloudentity authorizer and Cloudentity platform communication**
 
@@ -648,28 +651,28 @@ are polled back by the authorizer for policy decisions and enforcement locally.
 
 ![Cloudentity istio authorizer authorization](mp-authorizer-highlight.jpeg)
 
+
+#### Service Communication
+
 Login into the Cloudentity authorization admin portal and navigate to the `Enforcement >> Authorizers`. As shown in the below diagram, the `Last Active` column is an indication of communication status of the local authorizer with the remote platform.
 
 ![Cloudentity istio authorizer authorization](succesful-istio-connection.png)
 
 Regarding the communication security, the local Istio authorizer uses `OAuth` authorization mechanisms to authenticate itself to the Cloudentity authorization SaaS platform before handshaking information.
 
-* **Bind the discovered service**
+#### Discovered service from cluster
 
-Our next step is the process of binding the discovered services. Technically, this means we will register this discovered service as an `OAuth resource server` within
-the Cloudentity platform. If you had checked the box to autobind services while registering the Gateway, you can skip this step.
-
-Let's click on the services under `APIs` tab within the `Gateway` and click `Connect`. It will prompt to create a service (aka `OAuth resource server`). We can later attach scopes to service but for now we will just create a service and connect to it.
+If the business service(workload) is discovered from the remote Kubernets cluster, it should automatically be bound in the ACP platform. Technically, this means
+ Cloudentity authorization platform will register this discovered service as an `OAuth resource server` and can be governed from within the platform).
 
 ![Cloudentity istio authorizer authorization](bind-the-service.png)
 
-![Cloudentity istio authorizer authorization](create-resource-server.png)
+#### Govern GraphQL API and Schema**
 
-* **Explore GraphQL API and Schema**
+At this point, the remote workload should be available to govern within the Cloudentity authorization platform. In case of GraphQL workload, the schema annotated along with the workload
+is also transferred  by the local Cloudentity authorizer to the Cloudentity authorization platform. This enables us to explore the GraphQL schema for the workload and we can apply authorization policies and manage the policies applied to the various constructs within the GraphQL schema.
 
-Now that the service is created within the Cloudentity authorization platform, we can govern the service endpoints. The discovered GraphQL schema transferred by the local Cloudentity authorizer is now visible in the platform for applying policies and managing the policies applied to the various constructs within that GraphQL schema.
-
-![Cloudentity istio authorizer authorization](discovered-graphql-endpoint.png)
+![Cloudentity istio authorizer authorization](graphql-endpoint-mgmt.png)
 
 ![Cloudentity istio authorizer authorization](graphql-schema-discovered.png)
 
@@ -677,114 +680,6 @@ Now that the service is created within the Cloudentity authorization platform, w
 Now we have seen the service is available in the Cloudentity authorization platform for governance and central management of authorization policies, which will automatically be
 downloaded by respective local satelite Cloudentity authorizers bound to the services. This way the Cloudentity authorization platform acts as a very powerful and robust policy management services engine and the Cloudentity authorizers acts as policy runtime services that makes decisions using the policies governed and administered within the central policy management engine.
 
-Let's move back to the local Cloudentity authorizer to enforce traffic protection.
-
-
-### Attach Cloudentity authorizer as Istio external authorization provider
-
-Cloudentity Istio authorizer is designed to be a native Istio extension that uses [Istio External authorizer](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/) model.
-
-Let's enable the Istio extension provider to accept the Cloudentity Istio authorizer as an extension.
-
-![Cloudentity istio authorizer authorization](istio-auth-extn.jpeg)
-
-Edit the `istio config map` to define the external Cloudentity Istio authorizer.
-
-```bash
-kubectl edit configmap istio -n istio-system
-```
-Add `extensionProviders` under `mesh` section to indicate that `acp-authorizer` will be an external authz provider.
-
-```yaml
-data:
-  mesh: |-
-    extensionProviders:
-    - name: "acp-authorizer"
-      envoyExtAuthzGrpc:
-        service: "istio-authorizer.acp-system.svc.cluster.local"
-        port: "9001"
-```
-
- Final Sample config
-
-```yaml
-apiVersion: v1
-data:
-  mesh: |-
-    defaultConfig:
-      discoveryAddress: istiod.istio-system.svc:15012
-      tracing:
-        zipkin:
-          address: zipkin.istio-system:9411
-    extensionProviders:
-    - name: "acp-authorizer"
-      envoyExtAuthzGrpc:
-        service: "istio-authorizer.acp-system.svc.cluster.local"
-        port: "9001"
-    enablePrometheusMerge: true
-    rootNamespace: istio-system
-    trustDomain: cluster.local
-  meshNetworks: 'networks: {}'
-kind: ConfigMap
-metadata:
-  creationTimestamp: "2022-01-11T20:02:58Z"
-  labels:
-    install.operator.istio.io/owning-resource: unknown
-    istio.io/rev: default
-    operator.istio.io/component: Pilot
-    release: istiod
-  managedFields:
-  - apiVersion: v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:data:
-        .: {}
-        f:mesh: {}
-        f:meshNetworks: {}
-      f:metadata:
-        f:labels:
-          .: {}
-          f:install.operator.istio.io/owning-resource: {}
-          f:istio.io/rev: {}
-          f:operator.istio.io/component: {}
-          f:release: {}
-    manager: Go-http-client
-    operation: Update
-    time: "2022-01-11T20:02:58Z"
-  name: istio
-  namespace: istio-system
-  resourceVersion: "5345"
-  selfLink: /api/v1/namespaces/istio-system/configmaps/istio
-  uid: d0201eb4-bf46-4322-bb6c-1dd0c045c348
-```
-
-Restart `istiod` for the **external authorizer defintion** to be picked up
-
-```bash
-kubectl rollout restart deployment/istiod -n istio-system
-```
-
-### Enable Cloudentity external authorization
-
-Now that the external authorizer is defined, let's define and attach the [Istio external authorization policy](https://istio.io/latest/docs/concepts/security/#implicit-enablement).  
-External authorization policies are "CUSTOM" actions and will be evaluated first in the Istio authorization policy authorizer.
-
-```bash
-kubectl apply -f istio-configs/istio-mp-authorizer-policy.yaml
-```
-
-At this point, all the platform components are installed and configured and we should
-be able to apply externalized authorization policies in the Cloudentity authorization platform and
-see the policy decision and enforcement at runtime being done by the `Cloudentity Istio authorizers`
- running in a local Kubernetes cluster.
-
-### Restart the service pods
-
-Since we are using automatic Istio injection, we need to recreate the pod so that `envoy-proxy` is injected
-
-```
-kubectl rollout restart deployment/svc-apps-graphql-tweet-service-graphql-nodejs -n svc-apps-graph-ns
-```
 
 ## Enforce externalized dynamic authorization
 
