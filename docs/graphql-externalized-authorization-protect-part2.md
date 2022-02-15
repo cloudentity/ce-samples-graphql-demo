@@ -351,7 +351,7 @@ wget https://raw.githubusercontent.com/cloudentity/ce-samples-graphql-demo/blob/
 wget https://raw.githubusercontent.com/ce-samples-graphql-demo/blob/master/tweet-service-graphql-nodejs/Dockerfile
 ```
 
-Now let's build the docker image for GraphQL API using 
+Now let's build the docker image for GraphQL API using
 
 ```bash
 make build-image
@@ -443,7 +443,7 @@ We have condensed all required steps under the `make` target, which updates the 
 make deploy-istio
 ```
 
-Check the status of the pods: 
+Check the status of the pods:
 
 ```bash
 kubectl get pods -n istio-system
@@ -565,9 +565,16 @@ In this step, we will install and configure the Cloudentity Istio authorizer to 
 
 [Detailed Istio setup concepts and instruction are available here,](https://docs.authorization.cloudentity.com/guides/developer/protect/istio/) in a nutshell the steps are:
 * Navigate to the Cloudentity authorization platform admin console
-* Go to `Enforcement >> Authorizers` and Create a new Istio authorizer. Click on "Bind services automatically". Technically, this means we will register this discovered service as an `OAuth resource server` within
-the Cloudentity platform. 
-* Install the `istio-authorizer` in target Kubernetes using the `Helm` commands provided in installation instructions Step 1.
+* Go to `Enforcement >> Authorizers`, click on "Create Gateway," and create a new Istio authorizer. Select "Create and bind services automatically". Technically, this means we will register this discovered service as an `OAuth resource server` within
+the Cloudentity platform.
+* Install the `istio-authorizer` in target Kubernetes using the `helm` commands provided in the "Quickstart" installation instructions Step 1 (make sure to select the visibility icon to make the secrets visible before copying the commands). You will also need to edit the `helm upgrade` command to add the namespace `svc-apps-graph-ns` to the list of discovery namespaces, as shown below:
+
+```
+helm upgrade --install istio-authorizer acp/istio-authorizer \
+...
+  --set "discovery.namespaces={default,svc-apps-graph-ns}"\
+...
+```
 
 ---
 **NOTE**
@@ -613,9 +620,9 @@ helm upgrade --install istio-authorizer acp/istio-authorizer \
 }
 >```
 
-Step 2 , attach external authorization to Istio
+Step 2: attach external authorization to Istio
 
-Cloudentity Istio authorizer is designed to be a native Istio extension that uses [Istio External authorizer](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/) model.Add `extensionProviders` under `mesh` section to indicate that `acp-authorizer` will be an external authz provider.
+Cloudentity Istio authorizer is designed to be a native Istio extension that uses [Istio External authorizer](https://istio.io/latest/docs/tasks/security/authorization/authz-custom/) model. Following the Step 2 instructions under the "Quickstart" tab, add `extensionProviders` under `mesh` section to indicate that `acp-authorizer` will be an external authz provider.
 
 
 ```bash
